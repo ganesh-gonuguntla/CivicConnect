@@ -61,6 +61,11 @@ function CitizenDashboard() {
                                     {issue.status}
                                 </span>
                             </p>
+                            {issue.location && (issue.location.lat || issue.location.lng) && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                    📍 Location: {issue.location.address || `${issue.location.lat}, ${issue.location.lng}`}
+                                </p>
+                            )}
                         </div>
                     ))}
                 </div>

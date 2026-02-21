@@ -51,22 +51,35 @@ const uploadToCloudinary = (fileBuffer) => {
  */
 exports.createIssue = async (req, res) => {
     try {
-        const { title, description, category, lat, lng, address } = req.body;
+        const { title, description, category, location } = req.body;
 
         // Validate required fields
         if (!title || !description || !category) {
             return res.status(400).json({ msg: 'Please provide title, description, and category' });
         }
 
+        // Parse location JSON
+        let parsedLocation = {
+            lat: null,
+            lng: null,
+            address: null
+        };
+
+        if (location) {
+            try {
+                const locationObj = JSON.parse(location);
+                parsedLocation = {
+                    lat: locationObj.lat ? parseFloat(locationObj.lat) : null,
+                    lng: locationObj.lng ? parseFloat(locationObj.lng) : null,
+                    address: locationObj.address || null
+                };
+            } catch (e) {
+                console.error('Error parsing location:', e);
+            }
+        }
+
         // Map category to department
         const department = getDepartmentFromCategory(category);
-
-        // Parse location
-        const location = {
-            lat: lat ? parseFloat(lat) : null,
-            lng: lng ? parseFloat(lng) : null,
-            address: address || null
-        };
 
         // Upload image to Cloudinary if provided
         let imageURL = '';
@@ -96,7 +109,7 @@ exports.createIssue = async (req, res) => {
             imageURL,
             category,
             department,  // Set department from category mapping
-            location,
+            location: parsedLocation,
             createdBy: req.user.id,
             assignedOfficer,
         });
