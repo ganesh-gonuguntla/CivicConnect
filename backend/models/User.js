@@ -10,7 +10,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Roads', 'Water', 'Sanitation', 'Electricity', null],
         default: null
-    }
+    },
+    // Admin must verify officers before they can access the system
+    verified: { type: Boolean, default: false }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

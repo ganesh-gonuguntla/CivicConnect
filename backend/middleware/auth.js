@@ -16,6 +16,11 @@ const auth = async (req, res, next) => {
         const user = await User.findById(decoded.id).select('-password');
         if (!user) return res.status(401).json({ msg: 'User not found' });
 
+        // Block unverified officers — only admin can verify them
+        if (user.role === 'officer' && !user.verified) {
+            return res.status(403).json({ msg: 'Officer not verified by admin. Please contact the administrator.' });
+        }
+
         req.currentUser = user; // backward compatibility
         next();
     } catch (err) {
@@ -31,3 +36,4 @@ const permit = (...roles) => (req, res, next) => {
 };
 
 module.exports = { auth, permit };
+

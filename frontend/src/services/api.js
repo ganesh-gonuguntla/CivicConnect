@@ -33,3 +33,8 @@ export const updateIssueStatus = (id, data) =>
 // Admin endpoints
 export const getAllIssues = () => API.get("/issues/all");
 export const getAnalytics = () => API.get("/issues/analytics");
+
+// Officer management (admin only)
+export const getOfficers = () => API.get("/users/officers");
+export const verifyOfficer = (id) => API.put(`/users/${id}/verify`);
+export const unverifyOfficer = (id) => API.put(`/users/${id}/unverify`);

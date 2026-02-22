@@ -78,6 +78,7 @@ exports.register = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 department: user.department,
+                verified: user.verified,
             },
         });
     } catch (err) {
@@ -128,6 +129,7 @@ exports.login = async (req, res) => {
                 email: user.email,
                 role: user.role,
                 department: user.department,
+                verified: user.verified,
             },
         });
     } catch (err) {

@@ -11,11 +11,13 @@ app.use(express.json());
 const authRoutes = require('./routes/auth');
 const issueRoutes = require('./routes/issues');
 const deptRoutes = require('./routes/departments');
+const userRoutes = require('./routes/userRoutes');
 
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/issues', issueRoutes);
 app.use('/api/departments', deptRoutes);
+app.use('/api/users', userRoutes);
 
 // Test route
 app.get('/', (req, res) => {
