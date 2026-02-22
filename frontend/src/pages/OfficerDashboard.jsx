@@ -69,6 +69,11 @@ function OfficerDashboard() {
                             <p className="text-sm text-gray-500 mt-1">
                                 Category: {issue.category} | Department: {issue.department}
                             </p>
+                            {issue.location && (issue.location.lat || issue.location.lng) && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                    📍 Location: {issue.location.address || `${issue.location.lat}, ${issue.location.lng}`}
+                                </p>
+                            )}
                             <p className="text-sm text-gray-600">
                                 Status:{" "}
                                 <span

@@ -102,6 +102,7 @@ function AdminDashboard() {
                             <th className="py-2 px-3 text-left">Category</th>
                             <th className="py-2 px-3 text-left">Status</th>
                             <th className="py-2 px-3 text-left">Department</th>
+                            <th className="py-2 px-3 text-left">Location</th>
                             <th className="py-2 px-3 text-left">Created By</th>
                         </tr>
                     </thead>
@@ -112,6 +113,12 @@ function AdminDashboard() {
                                 <td className="py-2 px-3">{i.category}</td>
                                 <td className="py-2 px-3">{i.status}</td>
                                 <td className="py-2 px-3">{i.department}</td>
+                                <td className="py-2 px-3 text-sm">
+                                    {i.location && (i.location.lat || i.location.lng)
+                                        ? `${i.location.address || `${i.location.lat}, ${i.location.lng}`}`
+                                        : "—"
+                                    }
+                                </td>
                                 <td className="py-2 px-3">
                                     {i.createdBy?.name || "—"}
                                 </td>

@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Roads', 'Water', 'Sanitation', 'Electricity', null],
         default: null
-    }
+    },
+    lastLogin: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
