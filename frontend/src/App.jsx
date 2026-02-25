@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CitizenDashboard from './pages/CitizenDashboard';
+import AllMyIssues from './pages/AllMyIssues';
 import OfficerDashboard from './pages/OfficerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Navbar from './components/Navbar';
@@ -24,6 +25,14 @@ function App() {
           element={
             <ProtectedRoute role="citizen">
               <CitizenDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-issues"
+          element={
+            <ProtectedRoute role="citizen">
+              <AllMyIssues />
             </ProtectedRoute>
           }
         />
