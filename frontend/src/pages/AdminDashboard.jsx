@@ -40,13 +40,13 @@ function AdminDashboard() {
 
     return (
         <div className="p-6">
-            <h2 className="text-3xl font-bold text-blue-700 mb-4">Admin Dashboard</h2>
+            <h2 className="text-3xl font-bold text-purple-800 mb-4">Admin Dashboard</h2>
 
             {/* 🧮 Basic Stats */}
             <div className="flex flex-wrap gap-4 mb-6">
                 <div className="bg-white shadow p-4 rounded-lg flex-1 text-center">
                     <h3 className="text-gray-500">Total Issues</h3>
-                    <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+                    <p className="text-3xl font-bold text-purple-700">{stats.total}</p>
                 </div>
                 <div className="bg-white shadow p-4 rounded-lg flex-1 text-center">
                     <h3 className="text-gray-500">Resolved</h3>
@@ -96,7 +96,7 @@ function AdminDashboard() {
             <h3 className="text-2xl font-semibold mb-3">All Reported Issues</h3>
             <div className="overflow-x-auto">
                 <table className="min-w-full bg-white shadow rounded-lg">
-                    <thead className="bg-blue-100">
+                    <thead className="bg-purple-100">
                         <tr>
                             <th className="py-2 px-3 text-left">Title</th>
                             <th className="py-2 px-3 text-left">Category</th>

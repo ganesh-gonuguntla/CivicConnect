@@ -48,7 +48,7 @@ function ReportIssue() {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded mt-6">
-            <h2 className="text-2xl font-bold mb-4">Report a Civic Issue</h2>
+            {/* <h2 className="text-2xl font-bold mb-4">Report a Civic Issue</h2> */}
             {msg && <p className="mb-4 text-red-500">{msg}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
                 <input
@@ -97,7 +97,7 @@ function ReportIssue() {
                 />
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    className="w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700"
                     disabled={loading}
                 >
                     {loading ? "Submitting..." : "Report Issue"}

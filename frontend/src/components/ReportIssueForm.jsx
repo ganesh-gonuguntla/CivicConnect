@@ -312,9 +312,29 @@ function ReportIssueForm({ onSuccess }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
-        // Validate location
+        // Validate all required fields
+        if (!form.title || form.title.trim() === "") {
+            setMsg("Please enter a title!");
+            return;
+        }
+
+        if (!form.description || form.description.trim() === "") {
+            setMsg("Please enter a description!");
+            return;
+        }
+
+        if (!form.category || form.category.trim() === "") {
+            setMsg("Please select a category!");
+            return;
+        }
+
         if (!form.location.lat || !form.location.lng) {
-            setMsg("Please select a location first!");
+            setMsg("Please select a location!");
+            return;
+        }
+
+        if (!form.image) {
+            setMsg("Please upload a photo!");
             return;
         }
 
@@ -346,6 +366,7 @@ function ReportIssueForm({ onSuccess }) {
                 image: null,
             });
             setShowMap(false);
+            setImagePreview(null);
 
             if (onSuccess) onSuccess();
         } catch (err) {
@@ -357,7 +378,13 @@ function ReportIssueForm({ onSuccess }) {
     };
 
     return (
-        <div className="bg-white shadow-md p-6 rounded space-y-4">
+        <div className="bg-white shadow-lg p-5 rounded-xl space-y-4 max-h-[80vh] overflow-y-auto">
+            {/* Logo and Heading */}
+            <div className="flex flex-col items-center mb-4">
+                <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-12 h-12 mb-2" />
+                {/* <h2 className="text-2xl font-bold text-purple-800 text-center">Report a Civic Issue</h2> */}
+            </div>
+
             {msg && (
                 <p
                     className={
@@ -422,7 +449,7 @@ function ReportIssueForm({ onSuccess }) {
                             placeholder="Search location (e.g., 'Main Street')"
                             value={searchQuery}
                             onChange={(e) => handleLocationSearch(e.target.value)}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
                         />
                         
                         {/* Search Results Dropdown */}
@@ -433,7 +460,7 @@ function ReportIssueForm({ onSuccess }) {
                                         key={index}
                                         type="button"
                                         onClick={() => handleSelectLocation(result)}
-                                        className="w-full text-left p-2 hover:bg-blue-100 border-b text-sm"
+                                        className="w-full text-left p-2 hover:bg-purple-100 border-b text-sm"
                                     >
                                         <div className="font-semibold">{result.name}</div>
                                         <div className="text-gray-600 text-xs">{result.display_name}</div>
@@ -496,7 +523,7 @@ function ReportIssueForm({ onSuccess }) {
                                     <button
                                         type="button"
                                         onClick={() => setUseCamera(true)}
-                                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 mb-2"
+                                        className="w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700 mb-2"
                                     >
                                         📷 Take Photo with Camera
                                     </button>
@@ -547,8 +574,20 @@ function ReportIssueForm({ onSuccess }) {
 
                 <button
                     type="submit"
-                    className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
-                    disabled={loading}
+                    className={`w-full p-2 rounded font-semibold transition-colors ${
+                        form.title && form.description && form.category && form.location.lat && form.location.lng && form.image && !loading
+                            ? "bg-purple-600 text-white hover:bg-purple-700 cursor-pointer"
+                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    }`}
+                    disabled={!form.title || !form.description || !form.category || !form.location.lat || !form.location.lng || !form.image || loading}
+                    title={
+                        !form.title ? "Please enter a title"
+                        : !form.description ? "Please enter a description"
+                        : !form.category ? "Please select a category"
+                        : !form.location.lat || !form.location.lng ? "Please select a location"
+                        : !form.image ? "Please upload a photo"
+                        : "Submit your report"
+                    }
                 >
                     {loading ? "Submitting..." : "Report Issue"}
                 </button>

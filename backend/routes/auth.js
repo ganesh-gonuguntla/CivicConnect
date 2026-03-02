@@ -19,4 +19,15 @@ router.post('/login', authController.login);
 // @access  Private
 router.get('/me', auth, authController.getProfile);
 
+// @route   PUT /api/auth/update
+// @desc    Update name / password for current user
+// @access  Private
+router.put('/update', auth, authController.updateProfile);
+
+// @route   GET /api/auth/notifications
+// @desc    Get recent notifications for current user
+// @access  Private
+router.get('/notifications', auth, authController.getNotifications);
+router.put('/notifications/read', auth, authController.markNotificationsRead);
+
 module.exports = router;

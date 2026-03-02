@@ -14,7 +14,7 @@ function Login() {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
             <div className="bg-white p-8 rounded-xl shadow-md w-96">
-                <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">Login</h2>
+                <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <input
                         type="email"
@@ -35,7 +35,7 @@ function Login() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                        className="w-full bg-purple-700 text-white py-2 rounded-lg hover:bg-purple-800"
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>

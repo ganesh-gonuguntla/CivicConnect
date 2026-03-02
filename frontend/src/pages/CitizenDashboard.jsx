@@ -59,7 +59,7 @@ function CitizenDashboard() {
                     <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         {/* Modal Header */}
                         <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-                            <h3 className="text-2xl font-bold text-blue-700">Report a Civic Issue</h3>
+                            <h3 className="text-2xl font-bold text-purple-800">Report a Civic Issue</h3>
                             <button
                                 onClick={handleCloseModal}
                                 className="text-gray-600 hover:text-gray-900 text-2xl"
@@ -105,7 +105,7 @@ function CitizenDashboard() {
                                     {/* Content Section */}
                                     <div className="p-4">
                                         <div className="flex items-start justify-between mb-2">
-                                            <h4 className="text-lg font-semibold text-blue-700 flex-1">{issue.title}</h4>
+                                            <h4 className="text-lg font-semibold text-purple-800 flex-1">{issue.title}</h4>
                                             <span
                                                 className={`text-xs font-semibold px-2 py-1 rounded whitespace-nowrap ml-2 ${
                                                     issue.status === "Resolved"
@@ -120,7 +120,7 @@ function CitizenDashboard() {
                                         </div>
                                         <p className="text-gray-700 text-sm mb-3 line-clamp-2">{issue.description}</p>
                                         <div className="flex items-center justify-between text-xs text-gray-600">
-                                            <span className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                            <span className="inline-block bg-purple-100 text-purple-800 px-2 py-1 rounded">
                                                 {issue.category}
                                             </span>
                                             {issue.location?.address && (
@@ -137,7 +137,7 @@ function CitizenDashboard() {
                             <div className="text-center mt-6">
                                 <button
                                     onClick={() => navigate("/my-issues")}
-                                    className="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold"
+                                    className="bg-purple-700 text-white px-8 py-2 rounded-lg hover:bg-purple-800 transition duration-200 font-semibold"
                                 >
                                     View All Issues ({issues.length} total)
                                 </button>

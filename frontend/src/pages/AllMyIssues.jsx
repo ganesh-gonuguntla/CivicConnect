@@ -7,6 +7,7 @@ function AllMyIssues() {
     const [issues, setIssues] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState("all");
+    const [selectedIssue, setSelectedIssue] = useState(null);
 
     // 🧭 Fetch user's issues
     const fetchIssues = async () => {
@@ -38,7 +39,7 @@ function AllMyIssues() {
                     <h2 className="text-3xl font-bold text-gray-800">Your Reported Issues</h2>
                     <button
                         onClick={() => navigate("/citizen")}
-                        className="text-blue-600 hover:text-blue-800 font-semibold"
+                        className="text-purple-700 hover:text-purple-900 font-semibold"
                     >
                         ← Back to Dashboard
                     </button>
@@ -52,7 +53,7 @@ function AllMyIssues() {
                     onClick={() => setFilter("all")}
                     className={`px-4 py-2 rounded-lg font-semibold transition ${
                         filter === "all"
-                            ? "bg-blue-600 text-white"
+                            ? "bg-purple-700 text-white"
                             : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     }`}
                 >
@@ -108,7 +109,8 @@ function AllMyIssues() {
                     {filteredIssues.map((issue) => (
                         <div
                             key={issue._id}
-                            className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden"
+                            onClick={() => setSelectedIssue(issue)}
+                            className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden cursor-pointer"
                         >
                             <div className="flex flex-col md:flex-row">
                                 {/* Image */}
@@ -126,7 +128,7 @@ function AllMyIssues() {
                                 <div className="flex-1 p-6 flex flex-col justify-between">
                                     <div>
                                         <div className="flex items-start justify-between mb-3">
-                                            <h3 className="text-xl font-bold text-blue-700 flex-1">{issue.title}</h3>
+                                            <h3 className="text-xl font-bold text-purple-800 flex-1">{issue.title}</h3>
                                             <span
                                                 className={`text-xs font-semibold px-3 py-1 rounded whitespace-nowrap ml-2 ${
                                                     issue.status === "Resolved"
@@ -145,7 +147,7 @@ function AllMyIssues() {
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
                                         <div>
                                             <p className="font-semibold text-gray-800">Category</p>
-                                            <p className="text-blue-600">{issue.category}</p>
+                                            <p className="text-purple-700">{issue.category}</p>
                                         </div>
                                         {issue.location?.address && (
                                             <div>
@@ -174,6 +176,55 @@ function AllMyIssues() {
                     ))}
                 </div>
             )}
+
+                {/* Issue Detail Modal */}
+                {selectedIssue && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+                        <div className="bg-white rounded-lg max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-purple-800">{selectedIssue.title}</h3>
+                                <button onClick={() => setSelectedIssue(null)} className="text-xl">✕</button>
+                            </div>
+
+                            {selectedIssue.imageURL && (
+                                <div className="mb-4">
+                                    <img src={selectedIssue.imageURL} alt={selectedIssue.title} className="w-full h-64 object-cover rounded" />
+                                </div>
+                            )}
+
+                            <div className="mb-3 text-gray-700">{selectedIssue.description}</div>
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p className="font-semibold">Status</p>
+                                    <p>{selectedIssue.status}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Reported On</p>
+                                    <p>{new Date(selectedIssue.createdAt).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Accepted On</p>
+                                    <p>{selectedIssue.acceptedAt ? new Date(selectedIssue.acceptedAt).toLocaleString() : '—'}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Resolved On</p>
+                                    <p>{selectedIssue.resolvedAt ? new Date(selectedIssue.resolvedAt).toLocaleString() : '—'}</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 text-sm text-gray-600">
+                                <p className="font-semibold mb-2">Tracking & Details</p>
+                                <ul className="list-disc pl-5 space-y-1">
+                                    <li>Category: {selectedIssue.category}</li>
+                                    <li>Department: {selectedIssue.department || '—'}</li>
+                                    <li>Location: {selectedIssue.location?.address || '—'}</li>
+                                    <li>Assigned Officer: {selectedIssue.assignedOfficer?.name || 'Not assigned'}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                )}
         </div>
     );
 }

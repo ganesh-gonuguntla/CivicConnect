@@ -42,7 +42,7 @@ function OfficerDashboard() {
 
     return (
         <div className="p-6">
-            <h2 className="text-3xl font-bold text-blue-700 mb-4">
+            <h2 className="text-3xl font-bold text-purple-800 mb-4">
                 Officer Dashboard
             </h2>
 
@@ -55,7 +55,7 @@ function OfficerDashboard() {
                             key={issue._id}
                             className="bg-white p-4 shadow rounded-lg border border-gray-200"
                         >
-                            <h4 className="text-lg font-semibold text-blue-700">
+                            <h4 className="text-lg font-semibold text-purple-800">
                                 {issue.title}
                             </h4>
                             <p className="text-gray-700">{issue.description}</p>
