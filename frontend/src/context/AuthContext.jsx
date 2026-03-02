@@ -26,6 +26,23 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const loginWithGoogle = async (googleAccessToken) => {
+        try {
+            setLoading(true);
+            const res = await API.post("/auth/google", {
+                access_token: googleAccessToken,
+            });
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            setUser(res.data.user);
+            navigate(`/${res.data.user.role}`);
+        } catch (err) {
+            alert(err.response?.data?.msg || "Google login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const register = async (data) => {
         try {
             setLoading(true);
@@ -48,7 +65,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, loginWithGoogle, register, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );
