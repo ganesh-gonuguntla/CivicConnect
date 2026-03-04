@@ -1,7 +1,46 @@
 // controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const https = require('https');
 const User = require('../models/User');
+
+const fetchGoogleUser = (accessToken) => {
+    return new Promise((resolve, reject) => {
+        const req = https.request(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            },
+            (res) => {
+                let data = '';
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+                res.on('end', () => {
+                    if (res.statusCode !== 200) {
+                        return reject(
+                            new Error(
+                                `Failed to fetch Google user info, status ${res.statusCode}`
+                            )
+                        );
+                    }
+                    try {
+                        const parsed = JSON.parse(data);
+                        resolve(parsed);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            }
+        );
+
+        req.on('error', (err) => reject(err));
+        req.end();
+    });
+};
 
 /**
  * Register a new user
@@ -112,6 +151,9 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
+        user.lastLogin = new Date();
+        await user.save();
+
         // Generate JWT token
         const token = jwt.sign(
             { id: user._id, role: user.role },
@@ -133,6 +175,78 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error('Login Error:', err);
         res.status(500).json({ msg: 'Server error during login' });
+    }
+};
+
+/**
+ * Login or register using Google OAuth access token
+ * @route POST /api/auth/google
+ * @access Public
+ */
+exports.googleLogin = async (req, res) => {
+    try {
+        const { access_token: accessToken } = req.body;
+
+        if (!accessToken) {
+            return res.status(400).json({ msg: 'Missing Google access token' });
+        }
+
+        const googleUser = await fetchGoogleUser(accessToken);
+
+        if (!googleUser || !googleUser.email) {
+            return res
+                .status(400)
+                .json({ msg: 'Unable to retrieve Google account email' });
+        }
+
+        if (googleUser.email_verified === false) {
+            return res
+                .status(400)
+                .json({ msg: 'Google email is not verified' });
+        }
+
+        const email = googleUser.email.toLowerCase();
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            const randomPassword = Math.random().toString(36).slice(-12);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            user = new User({
+                name: googleUser.name || googleUser.given_name || 'Google User',
+                email,
+                password: hashedPassword,
+                role: 'citizen',
+                department: null,
+                lastLogin: new Date(),
+            });
+
+            await user.save();
+        } else {
+            user.lastLogin = new Date();
+            await user.save();
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                department: user.department,
+            },
+        });
+    } catch (err) {
+        console.error('Google Login Error:', err);
+        res.status(500).json({ msg: 'Server error during Google login' });
     }
 };
 

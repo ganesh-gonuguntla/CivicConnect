@@ -147,7 +147,14 @@ function HamburgerMenu() {
                             <h3 className="text-xl font-semibold text-purple-700">Report a Civic Issue</h3>
                             <button onClick={() => setShowReportModal(false)} className="text-xl">✕</button>
                         </div>
-                        <ReportIssueForm onSuccess={() => { setShowReportModal(false); fetchProfile(); }} />
+                        <ReportIssueForm
+                            embedded
+                            onSuccess={() => {
+                                setShowReportModal(false);
+                                fetchProfile();
+                                window.dispatchEvent(new Event("issueReported"));
+                            }}
+                        />
                     </div>
                 </div>
             )}

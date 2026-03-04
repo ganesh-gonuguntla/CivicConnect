@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Webcam from "react-webcam";
 
-function ReportIssueForm({ onSuccess }) {
+function ReportIssueForm({ onSuccess, embedded = false }) {
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -378,12 +378,23 @@ function ReportIssueForm({ onSuccess }) {
     };
 
     return (
-        <div className="bg-white shadow-lg p-5 rounded-xl space-y-4 max-h-[80vh] overflow-y-auto">
-            {/* Logo and Heading */}
-            <div className="flex flex-col items-center mb-4">
-                <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-12 h-12 mb-2" />
-                {/* <h2 className="text-2xl font-bold text-purple-800 text-center">Report a Civic Issue</h2> */}
-            </div>
+        <div
+            className={
+                embedded
+                    ? "space-y-4"
+                    : "bg-purple-500 shadow-lg p-5 rounded-xl space-y-4 max-h-[80vh] overflow-y-auto"
+            }
+        >
+            {/* Logo */}
+            {!embedded && (
+                <div className="flex flex-col items-center mb-4 bg-gray-200 p-4 rounded-lg">
+                    <img
+                        src="/src/assets/favicon.png"
+                        alt="CivicConnect Logo"
+                        className="w-12 h-12 mb-2"
+                    />
+                </div>
+            )}
 
             {msg && (
                 <p
@@ -396,13 +407,13 @@ function ReportIssueForm({ onSuccess }) {
                     {msg}
                 </p>
             )}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 ">
                 <input
                     name="title"
                     placeholder="Title"
                     value={form.title}
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
                     required
                 />
                 <textarea
@@ -410,14 +421,14 @@ function ReportIssueForm({ onSuccess }) {
                     placeholder="Description"
                     value={form.description}
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
                     required
                 />
                 <select
                     name="category"
                     value={form.category}
                     onChange={handleChange}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
                     required
                 >
                     <option value="">Select Category</option>
@@ -428,8 +439,8 @@ function ReportIssueForm({ onSuccess }) {
                 </select>
 
                 {/* Location Selection Section */}
-                <div className="border p-4 rounded bg-gray-50">
-                    <h3 className="font-bold mb-3">📍 Location</h3>
+                <div className="border-3 border-white p-4 rounded bg-gray-200">
+                  <center>  <h3 className="font-bold mb-3 ">📍 Location</h3></center>
                     
                     {/* Current Selection Display */}
                     <div className="space-y-2 mb-3">
@@ -449,7 +460,7 @@ function ReportIssueForm({ onSuccess }) {
                             placeholder="Search location (e.g., 'Main Street')"
                             value={searchQuery}
                             onChange={(e) => handleLocationSearch(e.target.value)}
-                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            className="w-full p-2 border-2 border-[#FF5A5A] rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
                         />
                         
                         {/* Search Results Dropdown */}
@@ -474,9 +485,9 @@ function ReportIssueForm({ onSuccess }) {
                     <button
                         type="button"
                         onClick={handleCurrentLocation}
-                        className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 mb-2"
+                        className="w-full bg-[#3A8B95] text-white p-2 rounded hover:bg-green-600 mb-2"
                     >
-                        📍 Use Current Location
+                     Use Current Location
                     </button>
 
                     {/* Map Display */}
@@ -495,8 +506,8 @@ function ReportIssueForm({ onSuccess }) {
                 </div>
 
                 {/* Photo Capture Section */}
-                <div className="border p-4 rounded bg-gray-50">
-                    <h3 className="font-bold mb-3">📷 Photo</h3>
+                <div className="border p-4 rounded bg-gray-200 border-3 border-white">
+                    <center><h3 className="font-bold mb-3">📷 Photo</h3></center>
                     
                     {/* Image Preview */}
                     {imagePreview ? (
@@ -523,13 +534,13 @@ function ReportIssueForm({ onSuccess }) {
                                     <button
                                         type="button"
                                         onClick={() => setUseCamera(true)}
-                                        className="w-full bg-purple-600 text-white p-2 rounded hover:bg-purple-700 mb-2"
+                                        className="w-full bg-[#3A8B95] text-white p-2 rounded hover:bg-purple-700 mb-2"
                                     >
-                                        📷 Take Photo with Camera
+                                         Take Photo with Camera
                                     </button>
                                     
                                     {/* File Upload Option */}
-                                    <div className="border-2 border-dashed rounded p-3">
+                                    <div className="border-2 border-[#FF5A5A] rounded p-3">
                                         <label className="block text-center cursor-pointer">
                                             <input
                                                 type="file"
@@ -537,7 +548,7 @@ function ReportIssueForm({ onSuccess }) {
                                                 onChange={handleFileChange}
                                                 className="hidden"
                                             />
-                                            <span className="text-gray-600">📁 Or choose an existing photo</span>
+                                            <span className="text-gray-600 "> Or choose an existing photo</span>
                                         </label>
                                     </div>
                                 </>

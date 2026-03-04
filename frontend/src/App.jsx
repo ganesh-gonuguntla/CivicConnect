@@ -7,7 +7,6 @@ import OfficerDashboard from './pages/OfficerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
-import ReportIssue from "./pages/ReportIssue";
 
 function App() {
   return (

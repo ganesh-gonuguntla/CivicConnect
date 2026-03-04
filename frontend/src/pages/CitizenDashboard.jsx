@@ -20,6 +20,16 @@ function CitizenDashboard() {
 
     useEffect(() => {
         fetchIssues();
+
+        const handleIssueReported = () => {
+            fetchIssues();
+        };
+
+        window.addEventListener("issueReported", handleIssueReported);
+
+        return () => {
+            window.removeEventListener("issueReported", handleIssueReported);
+        };
     }, []);
 
     // Get 2 most recent issues
@@ -69,7 +79,7 @@ function CitizenDashboard() {
                         </div>
                         {/* Modal Body */}
                         <div className="p-6">
-                            <ReportIssueForm onSuccess={handleFormSuccess} />
+                            <ReportIssueForm embedded onSuccess={handleFormSuccess} />
                         </div>
                     </div>
                 </div>

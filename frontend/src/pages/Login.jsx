@@ -18,6 +18,7 @@ function Login() {
         onError: () => {
             alert("Google login was cancelled or failed");
         },
+        scope: "openid profile email",
         flow: "implicit",
     });
 
