@@ -53,7 +53,7 @@ function OfficerDashboard() {
                     {issues.map((issue) => (
                         <div
                             key={issue._id}
-                            className="bg-white p-4 shadow rounded-lg border border-gray-200"
+                            className="bg-purple-50 p-4 shadow rounded-lg border border-gray-200"
                         >
                             <h4 className="text-lg font-semibold text-purple-800">
                                 {issue.title}

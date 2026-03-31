@@ -57,7 +57,7 @@ function CitizenDashboard() {
                 </p>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-white text-[#62109F] font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-200"
+                    className="bg-purple-50 text-[#62109F] font-semibold px-8 py-3 rounded-lg hover:bg-gray-100 transition duration-200"
                 >
                     + Report an Issue
                 </button>
@@ -65,10 +65,10 @@ function CitizenDashboard() {
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div className="fixed inset-0 backdrop-blur-sm bg-purple-50/10 flex items-center justify-center z-50 p-4">
+                    <div className="bg-purple-50 rounded-lg shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
                         {/* Modal Header */}
-                        <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+                        <div className="sticky top-0 bg-purple-50 border-b px-6 py-4 flex justify-between items-center">
                             <h3 className="text-2xl font-bold text-purple-800">Report a Civic Issue</h3>
                             <button
                                 onClick={handleCloseModal}
@@ -99,7 +99,7 @@ function CitizenDashboard() {
                             {recentIssues.map((issue) => (
                                 <div
                                     key={issue._id}
-                                    className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-200"
+                                    className="bg-purple-50 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-200"
                                 >
                                     {/* Image Section */}
                                     {issue.imageURL && (

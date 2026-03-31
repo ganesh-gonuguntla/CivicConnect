@@ -79,7 +79,7 @@ function HamburgerMenu() {
             <button
                 aria-label="Open menu"
                 onClick={() => setOpen(!open)}
-                className="p-2 rounded bg-white/10 hover:bg-white/20 text-white mr-3"
+                className="p-2 rounded bg-purple-50/10 hover:bg-purple-50/20 text-white mr-3"
             >
                 ☰
             </button>
@@ -155,7 +155,7 @@ function HamburgerMenu() {
             {/* Report Modal */}
             {showReportModal && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-                    <div className="bg-white rounded-lg max-w-2xl w-full p-4">
+                    <div className="bg-purple-50 rounded-lg max-w-2xl w-full p-4">
                         <div className="flex justify-between items-center mb-2">
                             <h3 className="text-xl font-semibold text-purple-700">Report a Civic Issue</h3>
                             <button onClick={() => setShowReportModal(false)} className="text-xl">✕</button>

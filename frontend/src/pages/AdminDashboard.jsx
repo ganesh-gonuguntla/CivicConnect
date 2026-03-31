@@ -44,15 +44,15 @@ function AdminDashboard() {
 
             {/* 🧮 Basic Stats */}
             <div className="flex flex-wrap gap-4 mb-6">
-                <div className="bg-white shadow p-4 rounded-lg flex-1 text-center">
+                <div className="bg-purple-50 shadow p-4 rounded-lg flex-1 text-center">
                     <h3 className="text-gray-500">Total Issues</h3>
                     <p className="text-3xl font-bold text-purple-700">{stats.total}</p>
                 </div>
-                <div className="bg-white shadow p-4 rounded-lg flex-1 text-center">
+                <div className="bg-purple-50 shadow p-4 rounded-lg flex-1 text-center">
                     <h3 className="text-gray-500">Resolved</h3>
                     <p className="text-3xl font-bold text-green-600">{stats.resolved}</p>
                 </div>
-                <div className="bg-white shadow p-4 rounded-lg flex-1 text-center">
+                <div className="bg-purple-50 shadow p-4 rounded-lg flex-1 text-center">
                     <h3 className="text-gray-500">Pending</h3>
                     <p className="text-3xl font-bold text-red-600">{stats.pending}</p>
                 </div>
@@ -60,7 +60,7 @@ function AdminDashboard() {
 
             {/* 📊 Charts */}
             <div className="grid md:grid-cols-2 gap-8 mb-8">
-                <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-purple-50 p-4 rounded-lg shadow">
                     <h3 className="text-lg font-semibold mb-2">Issue Categories</h3>
                     <PieChart width={300} height={300}>
                         <Pie
@@ -80,7 +80,7 @@ function AdminDashboard() {
                     </PieChart>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow">
+                <div className="bg-purple-50 p-4 rounded-lg shadow">
                     <h3 className="text-lg font-semibold mb-2">Resolved vs Pending</h3>
                     <BarChart width={300} height={300} data={[stats]}>
                         <XAxis dataKey="total" hide />
@@ -95,7 +95,7 @@ function AdminDashboard() {
             {/* 📋 All Issues List */}
             <h3 className="text-2xl font-semibold mb-3">All Reported Issues</h3>
             <div className="overflow-x-auto">
-                <table className="min-w-full bg-white shadow rounded-lg">
+                <table className="min-w-full bg-purple-50 shadow rounded-lg">
                     <thead className="bg-purple-100">
                         <tr>
                             <th className="py-2 px-3 text-left">Title</th>

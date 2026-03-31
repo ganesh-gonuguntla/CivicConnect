@@ -465,7 +465,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                         
                         {/* Search Results Dropdown */}
                         {showResults && searchResults.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 bg-white border rounded mt-1 shadow-lg max-h-48 overflow-y-auto z-10">
+                            <div className="absolute top-full left-0 right-0 bg-purple-50 border rounded mt-1 shadow-lg max-h-48 overflow-y-auto z-10">
                                 {searchResults.map((result, index) => (
                                     <button
                                         key={index}

@@ -58,7 +58,7 @@ function SettingsModal({ onClose }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-            <div ref={modalRef} className="bg-white rounded-lg max-w-md w-full p-6">
+            <div ref={modalRef} className="bg-purple-50 rounded-lg max-w-md w-full p-6">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-purple-700">Settings</h3>
                     <button onClick={onClose}>✕</button>
