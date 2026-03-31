@@ -25,6 +25,13 @@ const issueSchema = new mongoose.Schema({
         enum: ['Pending', 'In Progress', 'Resolved'],
         default: 'Pending'
     },
+    acceptedAt: { type: Date },
+    resolvedAt: { type: Date },
+    coinsAwarded: {
+        reported: { type: Boolean, default: false },
+        accepted: { type: Boolean, default: false },
+        resolved: { type: Boolean, default: false }
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

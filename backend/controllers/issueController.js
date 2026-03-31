@@ -121,6 +121,27 @@ exports.createIssue = async (req, res) => {
             .populate('createdBy', 'name email')
             .populate('assignedOfficer', 'name email department');
 
+        // Award coins for creating an issue (100 coins)
+        try {
+            if (!issue.coinsAwarded.reported) {
+                const User = require('../models/User');
+                await User.findByIdAndUpdate(req.user.id, {
+                    $inc: { coins: 100 },
+                    $push: {
+                        notifications: {
+                            message: `You earned 100 Civic Points for reporting: ${issue.title}`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.reported = true;
+                await issue.save();
+            }
+        } catch (coinErr) {
+            console.error('Error awarding coins on report:', coinErr);
+        }
+
         res.status(201).json({
             msg: 'Issue created successfully',
             issue: populatedIssue
@@ -303,7 +324,70 @@ exports.updateIssueStatus = async (req, res) => {
         }
 
         // Update status
+        const prevStatus = issue.status;
+        // Only proceed if status actually changes
+        if (prevStatus === status) {
+            return res.status(200).json({ msg: 'No status change', issue });
+        }
+
+        // Only allow forward transitions to avoid accidental re-awarding:
+        // Pending -> In Progress -> Resolved
+        const order = { 'Pending': 0, 'In Progress': 1, 'Resolved': 2 };
+        if (order[status] < order[prevStatus]) {
+            // don't allow moving backwards for awarding purposes; still update status if needed
+            issue.status = status;
+            await issue.save();
+            const updatedIssue = await Issue.findById(req.params.id)
+                .populate('createdBy', 'name email')
+                .populate('assignedOfficer', 'name email department')
+                .populate('comments.by', 'name email');
+            return res.json({ msg: 'Status updated (backwards); no awards', issue: updatedIssue });
+        }
+
         issue.status = status;
+
+        if (status === 'In Progress' && !issue.coinsAwarded.accepted) {
+            issue.acceptedAt = new Date();
+            // award 100 coins to reporter
+            try {
+                const User = require('../models/User');
+                // Ensure atomic-ish: only award if flag not already set
+                await User.findByIdAndUpdate(issue.createdBy, {
+                    $inc: { coins: 100 },
+                    $push: {
+                        notifications: {
+                            message: `Your report "${issue.title}" was accepted. You earned 100 Civic Points.`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.accepted = true;
+            } catch (coinErr) {
+                console.error('Error awarding coins on accept:', coinErr);
+            }
+        }
+
+        if (status === 'Resolved' && !issue.coinsAwarded.resolved) {
+            issue.resolvedAt = new Date();
+            // award 300 coins to reporter
+            try {
+                const User = require('../models/User');
+                await User.findByIdAndUpdate(issue.createdBy, {
+                    $inc: { coins: 300 },
+                    $push: {
+                        notifications: {
+                            message: `Your report "${issue.title}" was resolved. You earned 300 Civic Points.`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.resolved = true;
+            } catch (coinErr) {
+                console.error('Error awarding coins on resolve:', coinErr);
+            }
+        }
 
         // Add comment if provided
         if (comment && comment.trim()) {

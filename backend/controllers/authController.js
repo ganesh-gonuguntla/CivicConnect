@@ -1,7 +1,46 @@
 // controllers/authController.js
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const https = require('https');
 const User = require('../models/User');
+
+const fetchGoogleUser = (accessToken) => {
+    return new Promise((resolve, reject) => {
+        const req = https.request(
+            'https://www.googleapis.com/oauth2/v3/userinfo',
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                },
+            },
+            (res) => {
+                let data = '';
+                res.on('data', (chunk) => {
+                    data += chunk;
+                });
+                res.on('end', () => {
+                    if (res.statusCode !== 200) {
+                        return reject(
+                            new Error(
+                                `Failed to fetch Google user info, status ${res.statusCode}`
+                            )
+                        );
+                    }
+                    try {
+                        const parsed = JSON.parse(data);
+                        resolve(parsed);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+            }
+        );
+
+        req.on('error', (err) => reject(err));
+        req.end();
+    });
+};
 
 /**
  * Register a new user
@@ -112,6 +151,9 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
+        user.lastLogin = new Date();
+        await user.save();
+
         // Generate JWT token
         const token = jwt.sign(
             { id: user._id, role: user.role },
@@ -137,6 +179,78 @@ exports.login = async (req, res) => {
 };
 
 /**
+ * Login or register using Google OAuth access token
+ * @route POST /api/auth/google
+ * @access Public
+ */
+exports.googleLogin = async (req, res) => {
+    try {
+        const { access_token: accessToken } = req.body;
+
+        if (!accessToken) {
+            return res.status(400).json({ msg: 'Missing Google access token' });
+        }
+
+        const googleUser = await fetchGoogleUser(accessToken);
+
+        if (!googleUser || !googleUser.email) {
+            return res
+                .status(400)
+                .json({ msg: 'Unable to retrieve Google account email' });
+        }
+
+        if (googleUser.email_verified === false) {
+            return res
+                .status(400)
+                .json({ msg: 'Google email is not verified' });
+        }
+
+        const email = googleUser.email.toLowerCase();
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            const randomPassword = Math.random().toString(36).slice(-12);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(randomPassword, salt);
+
+            user = new User({
+                name: googleUser.name || googleUser.given_name || 'Google User',
+                email,
+                password: hashedPassword,
+                role: 'citizen',
+                department: null,
+                lastLogin: new Date(),
+            });
+
+            await user.save();
+        } else {
+            user.lastLogin = new Date();
+            await user.save();
+        }
+
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' }
+        );
+
+        res.json({
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                department: user.department,
+            },
+        });
+    } catch (err) {
+        console.error('Google Login Error:', err);
+        res.status(500).json({ msg: 'Server error during Google login' });
+    }
+};
+
+/**
  * Get current user profile
  * @route GET /api/auth/me
  * @access Private
@@ -147,9 +261,140 @@ exports.getProfile = async (req, res) => {
         if (!user) {
             return res.status(404).json({ msg: 'User not found' });
         }
-        res.json(user);
+        const userObj = user.toObject();
+        userObj.unreadNotifications = (userObj.notifications || []).filter(n => !n.read).length;
+        res.json(userObj);
     } catch (err) {
         console.error('Get Profile Error:', err);
         res.status(500).json({ msg: 'Server error' });
+    }
+};
+
+/**
+ * Update current user's profile (name / password)
+ * @route PUT /api/auth/update
+ * @access Private
+ */
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, password } = req.body;
+        const updates = {};
+
+        if (name) updates.name = name;
+        if (password) {
+            if (password.length < 6) return res.status(400).json({ msg: 'Password must be at least 6 characters' });
+            const salt = await bcrypt.genSalt(10);
+            updates.password = await bcrypt.hash(password, salt);
+        }
+
+        const user = await User.findByIdAndUpdate(req.user.id, updates, { new: true }).select('-password');
+        if (!user) return res.status(404).json({ msg: 'User not found' });
+
+        res.json({ msg: 'Profile updated', user });
+    } catch (err) {
+        console.error('Update Profile Error:', err);
+        res.status(500).json({ msg: 'Server error while updating profile' });
+    }
+};
+
+/**
+ * Get notifications for current user (latest week by default)
+ * @route GET /api/auth/notifications
+ * @access Private
+ */
+exports.getNotifications = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('notifications');
+        if (!user) return res.status(404).json({ msg: 'User not found' });
+
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        const recent = (user.notifications || [])
+            .filter(n => new Date(n.createdAt) >= oneWeekAgo)
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        res.json(recent);
+    } catch (err) {
+        console.error('Get Notifications Error:', err);
+        res.status(500).json({ msg: 'Server error while fetching notifications' });
+    }
+};
+
+/**
+ * Mark notifications as read for current user.
+ * Accepts optional array of notification ids in body; if omitted, marks all recent (1 week) notifications as read.
+ * @route PUT /api/auth/notifications/read
+ * @access Private
+ */
+exports.markNotificationsRead = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        const user = await User.findById(req.user.id);
+        if (!user) return res.status(404).json({ msg: 'User not found' });
+
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        if (Array.isArray(ids) && ids.length > 0) {
+            user.notifications = user.notifications.map(n => {
+                if (ids.includes(String(n._id))) {
+                    return { ...n.toObject(), read: true };
+                }
+                return n;
+            });
+        } else {
+            user.notifications = user.notifications.map(n => {
+                if (new Date(n.createdAt) >= oneWeekAgo) return { ...n.toObject(), read: true };
+                return n;
+            });
+        }
+
+        await user.save();
+        res.json({ msg: 'Notifications marked read' });
+    } catch (err) {
+        console.error('Mark Notifications Read Error:', err);
+        res.status(500).json({ msg: 'Server error while updating notifications' });
+    }
+};
+
+/**
+ * Get global leaderboard (top 10 citizens worldwide) and current user's rank
+ * @route GET /api/auth/leaderboard
+ * @access Private
+ */
+exports.getLeaderboard = async (req, res) => {
+    try {
+        const topUsers = await User.find({ role: 'citizen' })
+            .sort({ coins: -1 })
+            .limit(10)
+            .select('name coins role');
+        
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const higherCoinsCount = await User.countDocuments({
+            role: 'citizen',
+            coins: { $gt: currentUser.coins }
+        });
+
+        // For users with SAME coins, to handle ties accurately, we'd need a more complex query.
+        // For now, this estimates the rank reasonably well.
+        const currentUserRank = higherCoinsCount + 1;
+
+        res.json({
+            top10: topUsers,
+            currentUser: {
+                id: currentUser._id,
+                name: currentUser.name,
+                coins: currentUser.coins,
+                rank: currentUserRank
+            }
+        });
+    } catch (err) {
+        console.error('Get Leaderboard Error:', err);
+        res.status(500).json({ msg: 'Server error while fetching leaderboard' });
     }
 };

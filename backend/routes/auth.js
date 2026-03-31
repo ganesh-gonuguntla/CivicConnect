@@ -4,6 +4,11 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const { auth } = require('../middleware/auth');
 
+// @route   POST /api/auth/google
+// @desc    Login / register with Google OAuth
+// @access  Public
+router.post('/google', authController.googleLogin);
+
 // @route   POST /api/auth/register
 // @desc    Register a new user
 // @access  Public
@@ -18,5 +23,21 @@ router.post('/login', authController.login);
 // @desc    Get current user profile
 // @access  Private
 router.get('/me', auth, authController.getProfile);
+
+// @route   PUT /api/auth/update
+// @desc    Update name / password for current user
+// @access  Private
+router.put('/update', auth, authController.updateProfile);
+
+// @route   GET /api/auth/notifications
+// @desc    Get recent notifications for current user
+// @access  Private
+router.get('/notifications', auth, authController.getNotifications);
+router.put('/notifications/read', auth, authController.markNotificationsRead);
+
+// @route   GET /api/auth/leaderboard
+// @desc    Get top 10 citizens and user's rank
+// @access  Private
+router.get('/leaderboard', auth, authController.getLeaderboard);
 
 module.exports = router;

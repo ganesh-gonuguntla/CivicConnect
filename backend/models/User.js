@@ -11,7 +11,17 @@ const userSchema = new mongoose.Schema({
         enum: ['Roads', 'Water', 'Sanitation', 'Electricity', null],
         default: null
     },
-    lastLogin: { type: Date, default: null }
+    lastLogin: { type: Date, default: null },
+    coins: { type: Number, default: 0 },
+    notifications: [
+        {
+            message: { type: String },
+            type: { type: String },
+            createdAt: { type: Date, default: Date.now },
+            read: { type: Boolean, default: false },
+            meta: { type: Object, default: {} }
+        }
+    ]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
