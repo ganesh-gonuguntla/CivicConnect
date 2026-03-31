@@ -26,14 +26,14 @@ function LeaderboardModal({ onClose }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-[60] bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-purple-50 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-purple-700 to-indigo-600 p-6 flex justify-between items-center text-white">
                     <div>
                         <h2 className="text-3xl font-extrabold tracking-tight">Global Leaderboard</h2>
                         <p className="text-purple-100 text-sm mt-1">Top 10 Civic Pointers Worldwide</p>
                     </div>
-                    <button onClick={onClose} className="text-white hover:bg-white/20 p-2 rounded-full transition-colors">
+                    <button onClick={onClose} className="text-white hover:bg-purple-50/20 p-2 rounded-full transition-colors">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -75,7 +75,7 @@ function LeaderboardModal({ onClose }) {
                                         <div key={user._id} className={`grid grid-cols-12 gap-4 px-6 py-4 items-center transition-colors ${
                                             isMe 
                                             ? 'bg-purple-100 bg-opacity-80 border-l-4 border-purple-600 hover:bg-purple-200' 
-                                            : 'bg-white hover:bg-gray-50 border-l-4 border-transparent'
+                                            : 'bg-purple-50 hover:bg-gray-50 border-l-4 border-transparent'
                                         }`}>
                                             <div className="col-span-2 text-center flex justify-center items-center h-8">
                                                 {rankDisplay}

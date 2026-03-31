@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 
@@ -32,7 +33,7 @@ function Login() {
             className="flex flex-col items-center justify-center min-h-screen bg-cover bg-top bg-no-repeat"
             style={{ backgroundImage: "url('/mainback.png')" }}
         >
-            <div className="bg-white/20 backdrop-blur-sm p-8 mt-24 rounded-xl shadow-lg border border-white/20 w-96">
+            <div className="bg-purple-50/20 backdrop-blur-sm p-8 mt-24 rounded-xl shadow-lg border border-white/20 w-96">
               <center>  <img src="/src/assets/favicon.png"  alt="CivicConnect Logo" className="w-12 h-12 ml-2 rounded-full" /></center>
                 <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-4 ">
@@ -69,6 +70,12 @@ function Login() {
                         {loading ? "Signing in with Google..." : "Sign in with Google"}
                     </button>
                 </form>
+                
+                <div className="flex justify-end mt-4">
+                    <Link to="/register" className="text-sm font-bold text-white bg-purple-700/80 hover:bg-purple-800 px-4 py-2 rounded-lg transition-colors border border-purple-500">
+                        Sign up ➔
+                    </Link>
+                </div>
             </div>
         </div>
     );

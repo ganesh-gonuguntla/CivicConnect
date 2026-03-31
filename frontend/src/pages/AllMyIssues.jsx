@@ -110,7 +110,7 @@ function AllMyIssues() {
                         <div
                             key={issue._id}
                             onClick={() => setSelectedIssue(issue)}
-                            className="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden cursor-pointer"
+                            className="bg-purple-50 rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden cursor-pointer"
                         >
                             <div className="flex flex-col md:flex-row">
                                 {/* Image */}
@@ -180,7 +180,7 @@ function AllMyIssues() {
                 {/* Issue Detail Modal */}
                 {selectedIssue && (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-                        <div className="bg-white rounded-lg max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
+                        <div className="bg-purple-50 rounded-lg max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="text-xl font-bold text-purple-800">{selectedIssue.title}</h3>
                                 <button onClick={() => setSelectedIssue(null)} className="text-xl">✕</button>

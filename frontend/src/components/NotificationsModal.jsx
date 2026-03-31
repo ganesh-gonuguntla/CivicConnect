@@ -63,7 +63,7 @@ function NotificationsModal({ onClose, onRefresh }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-            <div ref={modalRef} className="bg-white rounded-lg max-w-lg w-full p-4">
+            <div ref={modalRef} className="bg-purple-50 rounded-lg max-w-lg w-full p-4">
                 <div className="flex justify-between items-center mb-3">
                     <h3 className="text-lg font-semibold text-purple-700">Notifications</h3>
                     <button onClick={onClose}>✕</button>
@@ -88,7 +88,7 @@ function NotificationsModal({ onClose, onRefresh }) {
                                 <div
                                     key={n._id}
                                     onClick={() => !n.read && markSingleRead(n._id)}
-                                    className={`p-3 border rounded cursor-pointer ${n.read ? 'bg-gray-100' : 'bg-white'} hover:bg-gray-50`}
+                                    className={`p-3 border rounded cursor-pointer ${n.read ? 'bg-gray-100' : 'bg-purple-50'} hover:bg-gray-50`}
                                 >
                                     <div className="text-sm text-gray-700">{n.message}</div>
                                     <div className="text-xs text-gray-500 mt-1">{new Date(n.createdAt).toLocaleString()}</div>
