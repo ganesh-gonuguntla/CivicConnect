@@ -35,4 +35,9 @@ router.put('/update', auth, authController.updateProfile);
 router.get('/notifications', auth, authController.getNotifications);
 router.put('/notifications/read', auth, authController.markNotificationsRead);
 
+// @route   GET /api/auth/leaderboard
+// @desc    Get top 10 citizens and user's rank
+// @access  Private
+router.get('/leaderboard', auth, authController.getLeaderboard);
+
 module.exports = router;

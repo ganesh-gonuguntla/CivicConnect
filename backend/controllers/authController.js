@@ -357,3 +357,44 @@ exports.markNotificationsRead = async (req, res) => {
         res.status(500).json({ msg: 'Server error while updating notifications' });
     }
 };
+
+/**
+ * Get global leaderboard (top 10 citizens worldwide) and current user's rank
+ * @route GET /api/auth/leaderboard
+ * @access Private
+ */
+exports.getLeaderboard = async (req, res) => {
+    try {
+        const topUsers = await User.find({ role: 'citizen' })
+            .sort({ coins: -1 })
+            .limit(10)
+            .select('name coins role');
+        
+        const currentUser = await User.findById(req.user.id);
+        if (!currentUser) {
+            return res.status(404).json({ msg: 'User not found' });
+        }
+
+        const higherCoinsCount = await User.countDocuments({
+            role: 'citizen',
+            coins: { $gt: currentUser.coins }
+        });
+
+        // For users with SAME coins, to handle ties accurately, we'd need a more complex query.
+        // For now, this estimates the rank reasonably well.
+        const currentUserRank = higherCoinsCount + 1;
+
+        res.json({
+            top10: topUsers,
+            currentUser: {
+                id: currentUser._id,
+                name: currentUser.name,
+                coins: currentUser.coins,
+                rank: currentUserRank
+            }
+        });
+    } catch (err) {
+        console.error('Get Leaderboard Error:', err);
+        res.status(500).json({ msg: 'Server error while fetching leaderboard' });
+    }
+};

@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import CitizenDashboard from './pages/CitizenDashboard';
@@ -9,9 +9,13 @@ import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
+  const location = useLocation();
+  const hideNavbarRoutes = ['/login', '/register', '/'];
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {shouldShowNavbar && <Navbar />}
 
       <Routes>
         <Route path="/" element={<Navigate to="/login" />} />

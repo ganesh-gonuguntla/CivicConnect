@@ -27,6 +27,7 @@ export const getMyIssues = () => API.get("/issues/my");
 export const updateProfile = (data) => API.put('/auth/update', data);
 export const getNotifications = () => API.get('/auth/notifications');
 export const getProfile = () => API.get('/auth/me');
+export const getLeaderboard = () => API.get('/auth/leaderboard');
 export const markNotificationsRead = (ids = []) => API.put('/auth/notifications/read', { ids });
 
 // Officer endpoints

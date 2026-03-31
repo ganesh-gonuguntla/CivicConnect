@@ -28,8 +28,11 @@ function Login() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen ">
-            <div className="bg-gray-200 p-8 rounded-xl  shadow-md w-96">
+        <div 
+            className="flex flex-col items-center justify-center min-h-screen bg-cover bg-top bg-no-repeat"
+            style={{ backgroundImage: "url('/mainback.png')" }}
+        >
+            <div className="bg-white/20 backdrop-blur-sm p-8 mt-24 rounded-xl shadow-lg border border-white/20 w-96">
               <center>  <img src="/src/assets/favicon.png"  alt="CivicConnect Logo" className="w-12 h-12 ml-2 rounded-full" /></center>
                 <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">Login</h2>
                 <form onSubmit={handleSubmit} className="space-y-4 ">

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ReportIssueForm from './ReportIssueForm';
 import SettingsModal from './SettingsModal';
 import NotificationsModal from './NotificationsModal';
+import LeaderboardModal from './LeaderboardModal';
 import { getProfile } from '../services/api';
 
 function HamburgerMenu() {
@@ -10,6 +11,7 @@ function HamburgerMenu() {
     const [showReportModal, setShowReportModal] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [profile, setProfile] = useState(null);
     const navigate = useNavigate();
 
@@ -69,6 +71,7 @@ function HamburgerMenu() {
         setShowReportModal(false);
         setShowSettings(false);
         setShowNotifications(false);
+        setShowLeaderboard(false);
     };
 
     return (
@@ -130,6 +133,16 @@ function HamburgerMenu() {
                         </li>
                         <hr className="border-white-500"></hr>
                         <li>
+                            <button
+                                onClick={() => { setShowLeaderboard(true); setOpen(false); }}
+                                className="relative w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors flex justify-between items-center"
+                            >
+                                <span>Leaderboard</span>
+                                🏆
+                            </button>
+                        </li>
+                        <hr className="border-white-500"></hr>
+                        <li>
                             <div className="px-3 py-2 text-sm">
                                 <div className="font-semibold">Civic Points</div>
                                 <div className="text-purple-700">{profile ? profile.coins : '0'}</div>
@@ -170,6 +183,11 @@ function HamburgerMenu() {
                     onClose={() => { setShowNotifications(false); fetchProfile(); }}
                     onRefresh={fetchProfile}
                 />
+            )}
+
+            {/* Leaderboard Modal */}
+            {showLeaderboard && (
+                <LeaderboardModal onClose={() => setShowLeaderboard(false)} />
             )}
         </div>
     );
