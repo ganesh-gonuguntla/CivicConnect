@@ -95,6 +95,7 @@ exports.register = async (req, res) => {
             password: hashedPassword,
             role,
             department: role === 'officer' ? department : null,
+            status: role === 'officer' ? 'pending' : 'approved',
         };
 
         // Create new user
@@ -116,6 +117,7 @@ exports.register = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
             },
         });
@@ -151,6 +153,13 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
+        if (user.role === 'officer' && user.status === 'pending') {
+            return res.status(403).json({ msg: 'Your account is waiting for admin approval' });
+        }
+        if (user.role === 'officer' && user.status === 'rejected') {
+            return res.status(403).json({ msg: 'Your officer account request was rejected' });
+        }
+
         user.lastLogin = new Date();
         await user.save();
 
@@ -169,6 +178,7 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
             },
         });
@@ -241,6 +251,7 @@ exports.googleLogin = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
             },
         });
@@ -396,5 +407,49 @@ exports.getLeaderboard = async (req, res) => {
     } catch (err) {
         console.error('Get Leaderboard Error:', err);
         res.status(500).json({ msg: 'Server error while fetching leaderboard' });
+    }
+};
+
+/**
+ * Admin: Get all pending officers
+ * @route GET /api/auth/officers/pending
+ * @access Private (admin)
+ */
+exports.getPendingOfficers = async (req, res) => {
+    try {
+        const officers = await User.find({ role: 'officer', status: 'pending' }).select('-password');
+        res.json(officers);
+    } catch (err) {
+        console.error('Get Pending Officers Error:', err);
+        res.status(500).json({ msg: 'Server error' });
+    }
+};
+
+/**
+ * Admin: Update officer status
+ * @route PUT /api/auth/officers/:id/status
+ * @access Private (admin)
+ */
+exports.updateOfficerStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!['approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ msg: 'Invalid status' });
+        }
+        
+        const officer = await User.findOneAndUpdate(
+            { _id: req.params.id, role: 'officer' },
+            { status },
+            { new: true }
+        ).select('-password');
+
+        if (!officer) {
+            return res.status(404).json({ msg: 'Officer not found' });
+        }
+
+        res.json({ msg: `Officer ${status} successfully`, officer });
+    } catch (err) {
+        console.error('Update Officer Status Error:', err);
+        res.status(500).json({ msg: 'Server error' });
     }
 };

@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['citizen', 'officer', 'admin'], default: 'citizen' },
+    status: { type: String, enum: ['approved', 'pending', 'rejected'], default: 'approved' },
     department: {
         type: String,
         enum: ['Roads', 'Water', 'Sanitation', 'Electricity', null],

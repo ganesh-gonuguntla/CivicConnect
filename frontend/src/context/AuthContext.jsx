@@ -47,6 +47,11 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/register", data);
+            if (res.data.user.role === "officer" && res.data.user.status === "pending") {
+                alert("Registration successful. Your account is waiting for admin approval");
+                navigate("/login");
+                return;
+            }
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);

@@ -30,4 +30,12 @@ const permit = (...roles) => (req, res, next) => {
     next();
 };
 
-module.exports = { auth, permit };
+const approvedOfficer = (req, res, next) => {
+    if (!req.currentUser) return res.status(401).json({ msg: 'Unauthorized' });
+    if (req.currentUser.role === 'officer' && req.currentUser.status !== 'approved') {
+        return res.status(403).json({ msg: 'Your account is waiting for admin approval' });
+    }
+    next();
+};
+
+module.exports = { auth, permit, approvedOfficer };

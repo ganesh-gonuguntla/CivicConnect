@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { auth } = require('../middleware/auth');
+const { auth, permit } = require('../middleware/auth');
 
 // @route   POST /api/auth/google
 // @desc    Login / register with Google OAuth
@@ -39,5 +39,15 @@ router.put('/notifications/read', auth, authController.markNotificationsRead);
 // @desc    Get top 10 citizens and user's rank
 // @access  Private
 router.get('/leaderboard', auth, authController.getLeaderboard);
+
+// @route   GET /api/auth/officers/pending
+// @desc    Get all pending officers
+// @access  Private (admin)
+router.get('/officers/pending', auth, permit('admin'), authController.getPendingOfficers);
+
+// @route   PUT /api/auth/officers/:id/status
+// @desc    Approve or reject officer
+// @access  Private (admin)
+router.put('/officers/:id/status', auth, permit('admin'), authController.updateOfficerStatus);
 
 module.exports = router;

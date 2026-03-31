@@ -39,3 +39,6 @@ export const updateIssueStatus = (id, data) =>
 // Admin endpoints
 export const getAllIssues = () => API.get("/issues/all");
 export const getAnalytics = () => API.get("/issues/analytics");
+export const getPendingOfficers = () => API.get("/auth/officers/pending");
+export const updateOfficerStatus = (id, status) => API.put(`/auth/officers/${id}/status`, { status });
+
