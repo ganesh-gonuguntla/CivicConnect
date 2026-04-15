@@ -420,6 +420,26 @@ exports.updateIssueStatus = async (req, res) => {
 };
 
 /**
+ * Delete an issue (admin only)
+ * @route DELETE /api/issues/:id
+ * @access Private (admin)
+ */
+exports.deleteIssue = async (req, res) => {
+    try {
+        const issue = await Issue.findById(req.params.id);
+        if (!issue) {
+            return res.status(404).json({ msg: 'Issue not found' });
+        }
+
+        await Issue.findByIdAndDelete(req.params.id);
+        res.json({ msg: 'Issue deleted successfully' });
+    } catch (err) {
+        console.error('Delete Issue Error:', err);
+        res.status(500).json({ msg: 'Server error while deleting issue' });
+    }
+};
+
+/**
  * Get analytics data (admin only)
  * @route GET /api/issues/analytics
  * @access Private (admin)

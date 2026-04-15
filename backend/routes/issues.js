@@ -63,6 +63,11 @@ router.get('/:id', auth, issueController.getIssueById);
 // @access  Private
 router.get('/', auth, issueController.getIssues);
 
+// @route   DELETE /api/issues/:id
+// @desc    Delete an issue (admin only)
+// @access  Private (admin)
+router.delete('/:id', auth, permit('admin'), issueController.deleteIssue);
+
 // @route   PUT /api/issues/:id/status
 // @desc    Update issue status and add comments
 // @access  Private (officer, admin)
