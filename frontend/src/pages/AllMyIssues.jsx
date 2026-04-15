@@ -1,6 +1,74 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getMyIssues } from "../services/api";
+import { getMyIssues, submitFeedback } from "../services/api";
+
+/* ── Star-rating feedback form shown on resolved issues ─────── */
+function FeedbackForm({ issue, onSubmitted }) {
+    const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
+    const [comment, setComment] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (rating === 0) { setError("Please select a star rating."); return; }
+        setSubmitting(true);
+        setError("");
+        try {
+            await submitFeedback(issue._id, { rating, comment });
+            onSubmitted({ rating, comment, submittedAt: new Date().toISOString() });
+        } catch (err) {
+            setError(err.response?.data?.msg || "Failed to submit feedback. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="mt-5 border-t border-purple-200 pt-5">
+            <h4 className="text-base font-bold text-purple-800 mb-3">⭐ Rate this Resolution</h4>
+            {/* Star Row */}
+            <div className="flex gap-1 mb-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHovered(star)}
+                        onMouseLeave={() => setHovered(0)}
+                        className={`text-3xl transition-transform hover:scale-110 ${
+                            star <= (hovered || rating) ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                    >
+                        ★
+                    </button>
+                ))}
+                {rating > 0 && (
+                    <span className="ml-2 text-sm text-gray-500 self-center">
+                        {["Poor", "Fair", "Good", "Very Good", "Excellent"][rating - 1]}
+                    </span>
+                )}
+            </div>
+            {/* Comment */}
+            <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience (optional)…"
+                rows={3}
+                className="w-full border border-purple-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-2"
+            />
+            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
+            <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition disabled:opacity-50"
+            >
+                {submitting ? "Submitting…" : "Submit Feedback"}
+            </button>
+        </form>
+    );
+}
 
 function AllMyIssues() {
     const navigate = useNavigate();
@@ -222,6 +290,41 @@ function AllMyIssues() {
                                     <li>Assigned Officer: {selectedIssue.assignedOfficer?.name || 'Not assigned'}</li>
                                 </ul>
                             </div>
+
+                            {/* ── Feedback area ── */}
+                            {selectedIssue.status === "Resolved" && (
+                                selectedIssue.feedback?.submitted ? (
+                                    <div className="mt-5 border-t border-purple-200 pt-5 bg-green-50 rounded-xl p-4">
+                                        <p className="text-green-700 font-bold text-sm mb-1">✅ Feedback Submitted</p>
+                                        <div className="flex gap-0.5 mb-1">
+                                            {[1,2,3,4,5].map(s => (
+                                                <span key={s} className={`text-xl ${ s <= selectedIssue.feedback.rating ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                                            ))}
+                                        </div>
+                                        {selectedIssue.feedback.comment && (
+                                            <p className="text-gray-600 text-sm italic">"{selectedIssue.feedback.comment}"</p>
+                                        )}
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Submitted on {new Date(selectedIssue.feedback.submittedAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <FeedbackForm
+                                        issue={selectedIssue}
+                                        onSubmitted={(fb) => {
+                                            setSelectedIssue(prev => ({
+                                                ...prev,
+                                                feedback: { submitted: true, ...fb }
+                                            }));
+                                            setIssues(prev => prev.map(i =>
+                                                i._id === selectedIssue._id
+                                                    ? { ...i, feedback: { submitted: true, ...fb } }
+                                                    : i
+                                            ));
+                                        }}
+                                    />
+                                )
+                            )}
                         </div>
                     </div>
                 )}

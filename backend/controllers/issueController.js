@@ -309,7 +309,7 @@ exports.updateIssueStatus = async (req, res) => {
     try {
         const { status, comment } = req.body;
 
-        // Validate status
+        // Validate status value
         const validStatuses = ['Pending', 'In Progress', 'Resolved'];
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({
@@ -323,35 +323,38 @@ exports.updateIssueStatus = async (req, res) => {
             return res.status(404).json({ msg: 'Issue not found' });
         }
 
-        // Update status
         const prevStatus = issue.status;
-        // Only proceed if status actually changes
+
+        // No-op: same status
         if (prevStatus === status) {
-            return res.status(200).json({ msg: 'No status change', issue });
+            return res.status(200).json({ msg: 'Status is already ' + status, issue });
         }
 
-        // Only allow forward transitions to avoid accidental re-awarding:
-        // Pending -> In Progress -> Resolved
-        const order = { 'Pending': 0, 'In Progress': 1, 'Resolved': 2 };
-        if (order[status] < order[prevStatus]) {
-            // don't allow moving backwards for awarding purposes; still update status if needed
-            issue.status = status;
-            await issue.save();
-            const updatedIssue = await Issue.findById(req.params.id)
-                .populate('createdBy', 'name email')
-                .populate('assignedOfficer', 'name email department')
-                .populate('comments.by', 'name email');
-            return res.json({ msg: 'Status updated (backwards); no awards', issue: updatedIssue });
+        // Block updates on already-resolved issues
+        if (prevStatus === 'Resolved') {
+            return res.status(400).json({ msg: 'This issue is already resolved and cannot be updated further.' });
         }
 
+        // Enforce forward-only transition: Pending → In Progress → Resolved
+        const allowedTransitions = {
+            'Pending':     'In Progress',
+            'In Progress': 'Resolved',
+        };
+
+        if (allowedTransitions[prevStatus] !== status) {
+            return res.status(400).json({
+                msg: `Invalid transition: "${prevStatus}" → "${status}". Allowed: Pending → In Progress → Resolved.`
+            });
+        }
+
+        // Apply status change
         issue.status = status;
 
+        // Award coins on "In Progress" (accepted)
         if (status === 'In Progress' && !issue.coinsAwarded.accepted) {
             issue.acceptedAt = new Date();
-            // award 100 coins to reporter
             try {
                 const User = require('../models/User');
-                // Ensure atomic-ish: only award if flag not already set
                 await User.findByIdAndUpdate(issue.createdBy, {
                     $inc: { coins: 100 },
                     $push: {
@@ -368,9 +371,9 @@ exports.updateIssueStatus = async (req, res) => {
             }
         }
 
+        // Award coins on "Resolved"
         if (status === 'Resolved' && !issue.coinsAwarded.resolved) {
             issue.resolvedAt = new Date();
-            // award 300 coins to reporter
             try {
                 const User = require('../models/User');
                 await User.findByIdAndUpdate(issue.createdBy, {
@@ -391,9 +394,7 @@ exports.updateIssueStatus = async (req, res) => {
 
         // Add comment if provided
         if (comment && comment.trim()) {
-            if (!issue.comments) {
-                issue.comments = [];
-            }
+            if (!issue.comments) issue.comments = [];
             issue.comments.push({
                 by: req.user.id,
                 text: comment.trim(),
@@ -410,12 +411,64 @@ exports.updateIssueStatus = async (req, res) => {
             .populate('comments.by', 'name email');
 
         res.json({
-            msg: 'Issue status updated successfully',
+            msg: `Issue status updated to "${status}" successfully`,
             issue: updatedIssue
         });
     } catch (err) {
         console.error('Update Issue Status Error:', err);
         res.status(500).json({ msg: 'Server error while updating issue' });
+    }
+};
+
+
+/**
+ * Submit citizen feedback for a resolved issue
+ * @route POST /api/issues/:id/feedback
+ * @access Private (citizen – must be the creator)
+ */
+exports.submitFeedback = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+
+        // Validate rating
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ msg: 'Rating must be between 1 and 5' });
+        }
+
+        const issue = await Issue.findById(req.params.id);
+        if (!issue) {
+            return res.status(404).json({ msg: 'Issue not found' });
+        }
+
+        // Only the citizen who created the issue can submit feedback
+        if (issue.createdBy.toString() !== req.user.id) {
+            return res.status(403).json({ msg: 'You can only submit feedback for your own issues' });
+        }
+
+        // Issue must be Resolved
+        if (issue.status !== 'Resolved') {
+            return res.status(400).json({ msg: 'Feedback can only be submitted for resolved issues' });
+        }
+
+        // Prevent duplicate feedback
+        if (issue.feedback && issue.feedback.submitted) {
+            return res.status(400).json({ msg: 'Feedback already submitted for this issue' });
+        }
+
+        // Save feedback
+        issue.feedback = {
+            submitted: true,
+            rating: Number(rating),
+            comment: comment ? comment.trim() : '',
+            submittedAt: new Date()
+        };
+
+        await issue.save();
+
+        res.json({ msg: 'Feedback submitted successfully', feedback: issue.feedback });
+    } catch (err) {
+        console.error('Submit Feedback Error:', err);
+        res.status(500).json({ msg: 'Server error while submitting feedback' });
     }
 };
 

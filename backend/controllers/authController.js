@@ -438,10 +438,18 @@ exports.updateOfficerStatus = async (req, res) => {
         if (!['approved', 'rejected'].includes(status)) {
             return res.status(400).json({ msg: 'Invalid status' });
         }
-        
+
+        // Keep both approval fields in sync:
+        // - status  → checked by login controller
+        // - verified → checked by auth middleware on every request
+        const updateFields = {
+            status,
+            verified: status === 'approved'   // true when approved, false when rejected
+        };
+
         const officer = await User.findOneAndUpdate(
             { _id: req.params.id, role: 'officer' },
-            { status },
+            updateFields,
             { new: true }
         ).select('-password');
 
