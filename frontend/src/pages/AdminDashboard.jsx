@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { getAllIssues, getPendingOfficers, updateOfficerStatus } from "../services/api";
+import { getAllIssues, getPendingOfficers, updateOfficerStatus, deleteIssue } from "../services/api";
 import { PieChart, Pie, Cell, Legend, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
 const COLORS = ["#60a5fa", "#fbbf24", "#34d399", "#f87171"];
@@ -50,6 +50,8 @@ function AdminDashboard() {
     const [stats, setStats] = useState({ total: 0, resolved: 0, pending: 0 });
     const [byCategory, setByCategory] = useState([]);
     const [actionLoading, setActionLoading] = useState(null); // officer id being actioned
+    const [deleteLoading, setDeleteLoading] = useState(null); // issue id being deleted
+    const [confirmModal, setConfirmModal] = useState(null); // { id, title }
     const [toast, setToast] = useState(null); // { msg, type }
 
     /* ── helpers ── */
@@ -88,6 +90,25 @@ function AdminDashboard() {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const handleDeleteIssue = async (id) => {
+        setConfirmModal(null);
+        setDeleteLoading(id);
+        try {
+            await deleteIssue(id);
+            setIssues((prev) => prev.filter((i) => i._id !== id));
+            // update stats live
+            setStats((prev) => ({
+                ...prev,
+                total: prev.total - 1,
+            }));
+            showToast("Issue deleted successfully", "success");
+        } catch (err) {
+            showToast(err.response?.data?.msg || "Failed to delete issue", "error");
+        } finally {
+            setDeleteLoading(null);
+        }
+    };
 
     const handleOfficerStatus = async (id, status) => {
         setActionLoading(id);
@@ -221,12 +242,13 @@ function AdminDashboard() {
                                         <th className="py-3 px-4 font-semibold border-b">Department</th>
                                         <th className="py-3 px-4 font-semibold border-b">Location</th>
                                         <th className="py-3 px-4 font-semibold border-b">Created By</th>
+                                        <th className="py-3 px-4 font-semibold border-b">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {issues.length === 0 && (
                                         <tr>
-                                            <td colSpan="6" className="py-8 text-center text-gray-400 italic">No issues found.</td>
+                                            <td colSpan="7" className="py-8 text-center text-gray-400 italic">No issues found.</td>
                                         </tr>
                                     )}
                                     {issues.map((i) => (
@@ -255,6 +277,20 @@ function AdminDashboard() {
                                             </td>
                                             <td className="py-3 px-4 text-gray-600 italic">
                                                 {i.createdBy?.name || "—"}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <button
+                                                    onClick={() => setConfirmModal({ id: i._id, title: i.title })}
+                                                    disabled={deleteLoading === i._id}
+                                                    className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-xs font-semibold hover:bg-red-100 hover:border-red-400 transition disabled:opacity-40"
+                                                >
+                                                    {deleteLoading === i._id ? (
+                                                        <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                                        </svg>
+                                                    ) : "🗑 Delete"}
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
@@ -327,6 +363,15 @@ function AdminDashboard() {
                 )}
             </div>
 
+            {/* Confirm Delete Modal */}
+            {confirmModal && (
+                <ConfirmModal
+                    title={confirmModal.title}
+                    onConfirm={() => handleDeleteIssue(confirmModal.id)}
+                    onCancel={() => setConfirmModal(null)}
+                />
+            )}
+
             {/* Toast */}
             {toast && (
                 <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />
@@ -340,6 +385,41 @@ function AdminDashboard() {
                 }
                 .animate-slide-up { animation: slide-up 0.3s ease both; }
             `}</style>
+        </div>
+    );
+}
+
+/* ── Confirmation Modal ─────────────────────────────────────────── */
+function ConfirmModal({ title, onConfirm, onCancel }) {
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 animate-slide-up">
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="text-3xl">⚠️</span>
+                    <h3 className="text-xl font-bold text-gray-800">Delete Request?</h3>
+                </div>
+                <p className="text-gray-600 mb-1">
+                    Are you sure you want to delete this request?
+                </p>
+                <p className="text-sm text-gray-400 bg-gray-50 rounded-lg px-3 py-2 mb-6 truncate">
+                    &ldquo;{title}&rdquo;
+                </p>
+                <p className="text-xs text-red-500 mb-6">⚠️ This action cannot be undone.</p>
+                <div className="flex gap-3 justify-end">
+                    <button
+                        onClick={onCancel}
+                        className="px-5 py-2 rounded-xl border border-gray-300 text-gray-600 font-medium hover:bg-gray-100 transition"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-5 py-2 rounded-xl bg-red-600 text-white font-semibold hover:bg-red-700 shadow transition"
+                    >
+                        Yes, Delete
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }
