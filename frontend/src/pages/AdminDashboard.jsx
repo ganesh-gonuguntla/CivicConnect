@@ -240,15 +240,15 @@ function AdminDashboard() {
                                         <th className="py-3 px-4 font-semibold border-b">Category</th>
                                         <th className="py-3 px-4 font-semibold border-b">Status</th>
                                         <th className="py-3 px-4 font-semibold border-b">Department</th>
-                                        <th className="py-3 px-4 font-semibold border-b">Location</th>
                                         <th className="py-3 px-4 font-semibold border-b">Created By</th>
+                                        <th className="py-3 px-4 font-semibold border-b">Feedback</th>
                                         <th className="py-3 px-4 font-semibold border-b">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {issues.length === 0 && (
                                         <tr>
-                                            <td colSpan="7" className="py-8 text-center text-gray-400 italic">No issues found.</td>
+                                            <td colSpan="8" className="py-8 text-center text-gray-400 italic">No issues found.</td>
                                         </tr>
                                     )}
                                     {issues.map((i) => (
@@ -269,14 +269,26 @@ function AdminDashboard() {
                                                 </span>
                                             </td>
                                             <td className="py-3 px-4 text-gray-600">{i.department}</td>
-                                            <td className="py-3 px-4 text-gray-500">
-                                                {i.location && (i.location.lat || i.location.lng)
-                                                    ? `${i.location.address || `${i.location.lat?.toFixed(2)}, ${i.location.lng?.toFixed(2)}`}`
-                                                    : "—"
-                                                }
-                                            </td>
                                             <td className="py-3 px-4 text-gray-600 italic">
                                                 {i.createdBy?.name || "—"}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                {i.feedback?.submitted ? (
+                                                    <div>
+                                                        <div className="flex gap-0.5">
+                                                            {[1,2,3,4,5].map(s => (
+                                                                <span key={s} className={`text-sm ${ s <= i.feedback.rating ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                                                            ))}
+                                                        </div>
+                                                        {i.feedback.comment && (
+                                                            <p className="text-xs text-gray-500 mt-0.5 max-w-[160px] truncate" title={i.feedback.comment}>
+                                                                {i.feedback.comment}
+                                                            </p>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-300 text-xs">—</span>
+                                                )}
                                             </td>
                                             <td className="py-3 px-4">
                                                 <button

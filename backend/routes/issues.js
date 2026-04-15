@@ -63,6 +63,11 @@ router.get('/:id', auth, issueController.getIssueById);
 // @access  Private
 router.get('/', auth, issueController.getIssues);
 
+// @route   POST /api/issues/:id/feedback
+// @desc    Submit citizen feedback for a resolved issue
+// @access  Private (citizen – must be the creator)
+router.post('/:id/feedback', auth, permit('citizen'), issueController.submitFeedback);
+
 // @route   DELETE /api/issues/:id
 // @desc    Delete an issue (admin only)
 // @access  Private (admin)
