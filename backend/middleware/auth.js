@@ -35,7 +35,6 @@ const permit = (...roles) => (req, res, next) => {
     next();
 };
 
-<<<<<<< HEAD
 const approvedOfficer = (req, res, next) => {
     if (!req.currentUser) return res.status(401).json({ msg: 'Unauthorized' });
     if (req.currentUser.role === 'officer' && req.currentUser.status !== 'approved') {
@@ -45,7 +44,3 @@ const approvedOfficer = (req, res, next) => {
 };
 
 module.exports = { auth, permit, approvedOfficer };
-=======
-module.exports = { auth, permit };
-
->>>>>>> a5355e05bb98d623a8c4f8a86aadf81c47108b0a
