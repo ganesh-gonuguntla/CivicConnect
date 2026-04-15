@@ -39,6 +39,14 @@ export const updateIssueStatus = (id, data) =>
 // Admin endpoints
 export const getAllIssues = () => API.get("/issues/all");
 export const getAnalytics = () => API.get("/issues/analytics");
+<<<<<<< HEAD
 export const getPendingOfficers = () => API.get("/auth/officers/pending");
 export const updateOfficerStatus = (id, status) => API.put(`/auth/officers/${id}/status`, { status });
 
+=======
+
+// Officer management (admin only)
+export const getOfficers = () => API.get("/users/officers");
+export const verifyOfficer = (id) => API.put(`/users/${id}/verify`);
+export const unverifyOfficer = (id) => API.put(`/users/${id}/unverify`);
+>>>>>>> a5355e05bb98d623a8c4f8a86aadf81c47108b0a

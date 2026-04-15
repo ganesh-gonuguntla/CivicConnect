@@ -18,7 +18,13 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
-            navigate(`/${res.data.user.role}`); // redirect by role
+
+            // Unverified officers cannot access the dashboard yet
+            if (res.data.user.role === "officer" && !res.data.user.verified) {
+                navigate("/pending-verification");
+            } else {
+                navigate(`/${res.data.user.role}`);
+            }
         } catch (err) {
             alert(err.response?.data?.msg || "Login failed");
         } finally {
@@ -55,7 +61,13 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
-            navigate(`/${res.data.user.role}`);
+
+            // Newly registered officers need admin approval first
+            if (res.data.user.role === "officer" && !res.data.user.verified) {
+                navigate("/pending-verification");
+            } else {
+                navigate(`/${res.data.user.role}`);
+            }
         } catch (err) {
             alert(err.response?.data?.msg || "Registration failed");
         } finally {

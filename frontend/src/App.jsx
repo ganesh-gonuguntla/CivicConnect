@@ -5,6 +5,7 @@ import CitizenDashboard from './pages/CitizenDashboard';
 import AllMyIssues from './pages/AllMyIssues';
 import OfficerDashboard from './pages/OfficerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import PendingVerification from './pages/PendingVerification';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/pending-verification" element={<PendingVerification />} />
 
         {/* Protected Routes */}
         <Route
@@ -61,3 +63,4 @@ function App() {
 }
 
 export default App;
+
