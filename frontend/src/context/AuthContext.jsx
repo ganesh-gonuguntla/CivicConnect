@@ -18,9 +18,32 @@ export const AuthProvider = ({ children }) => {
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
-            navigate(`/${res.data.user.role}`); // redirect by role
+
+            // Unverified officers cannot access the dashboard yet
+            if (res.data.user.role === "officer" && !res.data.user.verified) {
+                navigate("/pending-verification");
+            } else {
+                navigate(`/${res.data.user.role}`);
+            }
         } catch (err) {
             alert(err.response?.data?.msg || "Login failed");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const loginWithGoogle = async (googleAccessToken) => {
+        try {
+            setLoading(true);
+            const res = await API.post("/auth/google", {
+                access_token: googleAccessToken,
+            });
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            setUser(res.data.user);
+            navigate(`/${res.data.user.role}`);
+        } catch (err) {
+            alert(err.response?.data?.msg || "Google login failed");
         } finally {
             setLoading(false);
         }
@@ -30,10 +53,21 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/register", data);
+            if (res.data.user.role === "officer" && res.data.user.status === "pending") {
+                alert("Registration successful. Your account is waiting for admin approval");
+                navigate("/login");
+                return;
+            }
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
-            navigate(`/${res.data.user.role}`);
+
+            // Newly registered officers need admin approval first
+            if (res.data.user.role === "officer" && !res.data.user.verified) {
+                navigate("/pending-verification");
+            } else {
+                navigate(`/${res.data.user.role}`);
+            }
         } catch (err) {
             alert(err.response?.data?.msg || "Registration failed");
         } finally {
@@ -48,7 +82,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, loginWithGoogle, register, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

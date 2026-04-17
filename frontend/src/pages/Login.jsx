@@ -1,10 +1,27 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
-    const { login, loading } = useAuth();
+    const { login, loginWithGoogle, loading } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: (tokenResponse) => {
+            if (tokenResponse?.access_token) {
+                loginWithGoogle(tokenResponse.access_token);
+            } else {
+                alert("Google login did not return a valid token");
+            }
+        },
+        onError: () => {
+            alert("Google login was cancelled or failed");
+        },
+        scope: "openid profile email",
+        flow: "implicit",
+    });
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -12,16 +29,20 @@ function Login() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-            <div className="bg-white p-8 rounded-xl shadow-md w-96">
-                <h2 className="text-2xl font-bold text-blue-600 mb-4 text-center">Login</h2>
-                <form onSubmit={handleSubmit} className="space-y-4">
+        <div 
+            className="flex flex-col items-center justify-center min-h-screen bg-cover bg-top bg-no-repeat"
+            style={{ backgroundImage: "url('/mainback.png')" }}
+        >
+            <div className="bg-purple-50/20 backdrop-blur-sm p-8 mt-24 rounded-xl shadow-lg border border-white/20 w-96">
+              <center>  <img src="/src/assets/favicon.png"  alt="CivicConnect Logo" className="w-12 h-12 ml-2 rounded-full" /></center>
+                <h2 className="text-2xl font-bold text-purple-700 mb-4 text-center">Login</h2>
+                <form onSubmit={handleSubmit} className="space-y-4 ">
                     <input
                         type="email"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                        className="w-full border-2 border-[#FF5A5A] rounded-lg px-3 py-2"
                         required
                     />
                     <input
@@ -29,17 +50,32 @@ function Login() {
                         placeholder="Password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                        className="w-full border-2 border-[#FF5A5A] rounded-lg px-3 py-2"
                         required
                     />
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                        className="w-full bg-purple-700 border-2 border-white text-white py-2 rounded-lg hover:bg-purple-800"
                     >
                         {loading ? "Logging in..." : "Login"}
                     </button>
+
+                    <button
+                        type="button"
+                        disabled={loading}
+                        onClick={() => handleGoogleLogin()}
+                        className="w-full bg-[#3A8B95] border-2 border-white text-white py-2 rounded-lg hover:bg-purple-800 disabled:opacity-70"
+                    >
+                        {loading ? "Signing in with Google..." : "Sign in with Google"}
+                    </button>
                 </form>
+                
+                <div className="flex justify-end mt-4">
+                    <Link to="/register" className="text-sm font-bold text-white bg-purple-700/80 hover:bg-purple-800 px-4 py-2 rounded-lg transition-colors border border-purple-500">
+                        Sign up ➔
+                    </Link>
+                </div>
             </div>
         </div>
     );

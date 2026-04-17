@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Change if backend runs elsewhere
 const API = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: "http://localhost:3000/api",
 });
 
 // Automatically attach token to requests (if logged in)
@@ -24,6 +24,12 @@ export const createIssue = (formData) =>
 
 export const getMyIssues = () => API.get("/issues/my");
 
+export const updateProfile = (data) => API.put('/auth/update', data);
+export const getNotifications = () => API.get('/auth/notifications');
+export const getProfile = () => API.get('/auth/me');
+export const getLeaderboard = () => API.get('/auth/leaderboard');
+export const markNotificationsRead = (ids = []) => API.put('/auth/notifications/read', { ids });
+
 // Officer endpoints
 export const getAssignedIssues = () => API.get("/issues/assigned");
 
@@ -33,3 +39,8 @@ export const updateIssueStatus = (id, data) =>
 // Admin endpoints
 export const getAllIssues = () => API.get("/issues/all");
 export const getAnalytics = () => API.get("/issues/analytics");
+export const getPendingOfficers = () => API.get("/auth/officers/pending");
+export const updateOfficerStatus = (id, status) => API.put(`/auth/officers/${id}/status`, { status });
+export const deleteIssue = (id) => API.delete(`/issues/${id}`);
+export const submitFeedback = (id, data) => API.post(`/issues/${id}/feedback`, data);
+

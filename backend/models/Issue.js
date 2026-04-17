@@ -25,6 +25,13 @@ const issueSchema = new mongoose.Schema({
         enum: ['Pending', 'In Progress', 'Resolved'],
         default: 'Pending'
     },
+    acceptedAt: { type: Date },
+    resolvedAt: { type: Date },
+    coinsAwarded: {
+        reported: { type: Boolean, default: false },
+        accepted: { type: Boolean, default: false },
+        resolved: { type: Boolean, default: false }
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -38,7 +45,13 @@ const issueSchema = new mongoose.Schema({
         by: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         text: { type: String },
         at: { type: Date, default: Date.now }
-    }]
+    }],
+    feedback: {
+        submitted:    { type: Boolean, default: false },
+        rating:       { type: Number, min: 1, max: 5 },
+        comment:      { type: String },
+        submittedAt:  { type: Date }
+    }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Issue', issueSchema);

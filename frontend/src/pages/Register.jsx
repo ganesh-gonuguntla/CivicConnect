@@ -20,8 +20,11 @@ function Register() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50">
-            <div className="bg-white p-8 rounded-xl shadow-md w-96">
+        <div 
+            className="flex flex-col items-center justify-center min-h-screen bg-cover bg-top bg-no-repeat"
+            style={{ backgroundImage: "url('/mainback.png')" }}
+        >
+            <div className="bg-purple-50/20 backdrop-blur-sm p-8 mt-24 rounded-xl shadow-lg border border-white/20 w-96">
                 <h2 className="text-2xl font-bold text-green-600 mb-4 text-center">
                     Register
                 </h2>

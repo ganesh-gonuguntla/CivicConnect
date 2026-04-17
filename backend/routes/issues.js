@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const issueController = require('../controllers/issueController');
-const { auth, permit } = require('../middleware/auth');
+const { auth, permit, approvedOfficer } = require('../middleware/auth');
 
 // Multer setup for memory storage (Cloudinary upload)
 const storage = multer.memoryStorage();
@@ -41,7 +41,7 @@ router.get('/my', auth, issueController.getMyIssues);
 // @route   GET /api/issues/assigned
 // @desc    Get issues assigned to officer's department
 // @access  Private (officer)
-router.get('/assigned', auth, permit('officer'), issueController.getAssignedIssues);
+router.get('/assigned', auth, approvedOfficer, permit('officer'), issueController.getAssignedIssues);
 
 // @route   GET /api/issues/all
 // @desc    Get all issues (admin only)
@@ -63,9 +63,19 @@ router.get('/:id', auth, issueController.getIssueById);
 // @access  Private
 router.get('/', auth, issueController.getIssues);
 
+// @route   POST /api/issues/:id/feedback
+// @desc    Submit citizen feedback for a resolved issue
+// @access  Private (citizen – must be the creator)
+router.post('/:id/feedback', auth, permit('citizen'), issueController.submitFeedback);
+
+// @route   DELETE /api/issues/:id
+// @desc    Delete an issue (admin only)
+// @access  Private (admin)
+router.delete('/:id', auth, permit('admin'), issueController.deleteIssue);
+
 // @route   PUT /api/issues/:id/status
 // @desc    Update issue status and add comments
 // @access  Private (officer, admin)
-router.put('/:id/status', auth, permit('officer', 'admin'), issueController.updateIssueStatus);
+router.put('/:id/status', auth, approvedOfficer, permit('officer', 'admin'), issueController.updateIssueStatus);
 
 module.exports = router;

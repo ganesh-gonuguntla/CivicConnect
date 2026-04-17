@@ -1,0 +1,335 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getMyIssues, submitFeedback } from "../services/api";
+
+/* ── Star-rating feedback form shown on resolved issues ─────── */
+function FeedbackForm({ issue, onSubmitted }) {
+    const [rating, setRating] = useState(0);
+    const [hovered, setHovered] = useState(0);
+    const [comment, setComment] = useState("");
+    const [submitting, setSubmitting] = useState(false);
+    const [error, setError] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (rating === 0) { setError("Please select a star rating."); return; }
+        setSubmitting(true);
+        setError("");
+        try {
+            await submitFeedback(issue._id, { rating, comment });
+            onSubmitted({ rating, comment, submittedAt: new Date().toISOString() });
+        } catch (err) {
+            setError(err.response?.data?.msg || "Failed to submit feedback. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="mt-5 border-t border-purple-200 pt-5">
+            <h4 className="text-base font-bold text-purple-800 mb-3">⭐ Rate this Resolution</h4>
+            {/* Star Row */}
+            <div className="flex gap-1 mb-3">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRating(star)}
+                        onMouseEnter={() => setHovered(star)}
+                        onMouseLeave={() => setHovered(0)}
+                        className={`text-3xl transition-transform hover:scale-110 ${
+                            star <= (hovered || rating) ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                    >
+                        ★
+                    </button>
+                ))}
+                {rating > 0 && (
+                    <span className="ml-2 text-sm text-gray-500 self-center">
+                        {["Poor", "Fair", "Good", "Very Good", "Excellent"][rating - 1]}
+                    </span>
+                )}
+            </div>
+            {/* Comment */}
+            <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Share your experience (optional)…"
+                rows={3}
+                className="w-full border border-purple-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-2"
+            />
+            {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
+            <button
+                type="submit"
+                disabled={submitting}
+                className="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition disabled:opacity-50"
+            >
+                {submitting ? "Submitting…" : "Submit Feedback"}
+            </button>
+        </form>
+    );
+}
+
+function AllMyIssues() {
+    const navigate = useNavigate();
+    const [issues, setIssues] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filter, setFilter] = useState("all");
+    const [selectedIssue, setSelectedIssue] = useState(null);
+
+    // 🧭 Fetch user's issues
+    const fetchIssues = async () => {
+        try {
+            setLoading(true);
+            const res = await getMyIssues();
+            setIssues(res.data);
+        } catch (err) {
+            console.error("Error fetching issues:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchIssues();
+    }, []);
+
+    // Filter issues based on status
+    const filteredIssues = filter === "all" 
+        ? issues 
+        : issues.filter(issue => issue.status === filter);
+
+    return (
+        <div className="p-6 max-w-7xl mx-auto">
+            {/* Header */}
+            <div className="mb-8">
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-3xl font-bold text-gray-800">Your Reported Issues</h2>
+                    <button
+                        onClick={() => navigate("/citizen")}
+                        className="text-purple-700 hover:text-purple-900 font-semibold"
+                    >
+                        ← Back to Dashboard
+                    </button>
+                </div>
+                <p className="text-gray-600">Total Issues: {issues.length}</p>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="mb-6 flex gap-3 flex-wrap">
+                <button
+                    onClick={() => setFilter("all")}
+                    className={`px-4 py-2 rounded-lg font-semibold transition ${
+                        filter === "all"
+                            ? "bg-purple-700 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                    All ({issues.length})
+                </button>
+                <button
+                    onClick={() => setFilter("Pending")}
+                    className={`px-4 py-2 rounded-lg font-semibold transition ${
+                        filter === "Pending"
+                            ? "bg-red-600 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                    Pending ({issues.filter(i => i.status === "Pending").length})
+                </button>
+                <button
+                    onClick={() => setFilter("In Progress")}
+                    className={`px-4 py-2 rounded-lg font-semibold transition ${
+                        filter === "In Progress"
+                            ? "bg-yellow-600 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                    In Progress ({issues.filter(i => i.status === "In Progress").length})
+                </button>
+                <button
+                    onClick={() => setFilter("Resolved")}
+                    className={`px-4 py-2 rounded-lg font-semibold transition ${
+                        filter === "Resolved"
+                            ? "bg-green-600 text-white"
+                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                    Resolved ({issues.filter(i => i.status === "Resolved").length})
+                </button>
+            </div>
+
+            {/* Loading State */}
+            {loading ? (
+                <div className="text-center py-12">
+                    <p className="text-gray-600 text-lg">Loading issues...</p>
+                </div>
+            ) : filteredIssues.length === 0 ? (
+                <div className="bg-gray-100 rounded-lg p-12 text-center">
+                    <p className="text-gray-600 text-lg">
+                        {filter === "all"
+                            ? "No issues reported yet."
+                            : `No ${filter.toLowerCase()} issues.`}
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {filteredIssues.map((issue) => (
+                        <div
+                            key={issue._id}
+                            onClick={() => setSelectedIssue(issue)}
+                            className="bg-purple-50 rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden cursor-pointer"
+                        >
+                            <div className="flex flex-col md:flex-row">
+                                {/* Image */}
+                                {issue.imageURL && (
+                                    <div className="md:w-48 h-48 md:h-auto bg-gray-200 flex-shrink-0">
+                                        <img
+                                            src={issue.imageURL}
+                                            alt={issue.title}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Content */}
+                                <div className="flex-1 p-6 flex flex-col justify-between">
+                                    <div>
+                                        <div className="flex items-start justify-between mb-3">
+                                            <h3 className="text-xl font-bold text-purple-800 flex-1">{issue.title}</h3>
+                                            <span
+                                                className={`text-xs font-semibold px-3 py-1 rounded whitespace-nowrap ml-2 ${
+                                                    issue.status === "Resolved"
+                                                        ? "bg-green-100 text-green-800"
+                                                        : issue.status === "In Progress"
+                                                            ? "bg-yellow-100 text-yellow-800"
+                                                            : "bg-red-100 text-red-800"
+                                                }`}
+                                            >
+                                                {issue.status}
+                                            </span>
+                                        </div>
+                                        <p className="text-gray-700 mb-4">{issue.description}</p>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                                        <div>
+                                            <p className="font-semibold text-gray-800">Category</p>
+                                            <p className="text-purple-700">{issue.category}</p>
+                                        </div>
+                                        {issue.location?.address && (
+                                            <div>
+                                                <p className="font-semibold text-gray-800">Location</p>
+                                                <p className="text-gray-700">{issue.location.address}</p>
+                                            </div>
+                                        )}
+                                        {issue.createdAt && (
+                                            <div>
+                                                <p className="font-semibold text-gray-800">Reported On</p>
+                                                <p className="text-gray-700">
+                                                    {new Date(issue.createdAt).toLocaleDateString()}
+                                                </p>
+                                            </div>
+                                        )}
+                                        {issue.department?.name && (
+                                            <div>
+                                                <p className="font-semibold text-gray-800">Department</p>
+                                                <p className="text-gray-700">{issue.department.name}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+                {/* Issue Detail Modal */}
+                {selectedIssue && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+                        <div className="bg-purple-50 rounded-lg max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-xl font-bold text-purple-800">{selectedIssue.title}</h3>
+                                <button onClick={() => setSelectedIssue(null)} className="text-xl">✕</button>
+                            </div>
+
+                            {selectedIssue.imageURL && (
+                                <div className="mb-4">
+                                    <img src={selectedIssue.imageURL} alt={selectedIssue.title} className="w-full h-64 object-cover rounded" />
+                                </div>
+                            )}
+
+                            <div className="mb-3 text-gray-700">{selectedIssue.description}</div>
+
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p className="font-semibold">Status</p>
+                                    <p>{selectedIssue.status}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Reported On</p>
+                                    <p>{new Date(selectedIssue.createdAt).toLocaleString()}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Accepted On</p>
+                                    <p>{selectedIssue.acceptedAt ? new Date(selectedIssue.acceptedAt).toLocaleString() : '—'}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Resolved On</p>
+                                    <p>{selectedIssue.resolvedAt ? new Date(selectedIssue.resolvedAt).toLocaleString() : '—'}</p>
+                                </div>
+                            </div>
+
+                            <div className="mt-4 text-sm text-gray-600">
+                                <p className="font-semibold mb-2">Tracking & Details</p>
+                                <ul className="list-disc pl-5 space-y-1">
+                                    <li>Category: {selectedIssue.category}</li>
+                                    <li>Department: {selectedIssue.department || '—'}</li>
+                                    <li>Location: {selectedIssue.location?.address || '—'}</li>
+                                    <li>Assigned Officer: {selectedIssue.assignedOfficer?.name || 'Not assigned'}</li>
+                                </ul>
+                            </div>
+
+                            {/* ── Feedback area ── */}
+                            {selectedIssue.status === "Resolved" && (
+                                selectedIssue.feedback?.submitted ? (
+                                    <div className="mt-5 border-t border-purple-200 pt-5 bg-green-50 rounded-xl p-4">
+                                        <p className="text-green-700 font-bold text-sm mb-1">✅ Feedback Submitted</p>
+                                        <div className="flex gap-0.5 mb-1">
+                                            {[1,2,3,4,5].map(s => (
+                                                <span key={s} className={`text-xl ${ s <= selectedIssue.feedback.rating ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                                            ))}
+                                        </div>
+                                        {selectedIssue.feedback.comment && (
+                                            <p className="text-gray-600 text-sm italic">"{selectedIssue.feedback.comment}"</p>
+                                        )}
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            Submitted on {new Date(selectedIssue.feedback.submittedAt).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <FeedbackForm
+                                        issue={selectedIssue}
+                                        onSubmitted={(fb) => {
+                                            setSelectedIssue(prev => ({
+                                                ...prev,
+                                                feedback: { submitted: true, ...fb }
+                                            }));
+                                            setIssues(prev => prev.map(i =>
+                                                i._id === selectedIssue._id
+                                                    ? { ...i, feedback: { submitted: true, ...fb } }
+                                                    : i
+                                            ));
+                                        }}
+                                    />
+                                )
+                            )}
+                        </div>
+                    </div>
+                )}
+        </div>
+    );
+}
+
+export default AllMyIssues;

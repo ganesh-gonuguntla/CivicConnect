@@ -51,22 +51,35 @@ const uploadToCloudinary = (fileBuffer) => {
  */
 exports.createIssue = async (req, res) => {
     try {
-        const { title, description, category, lat, lng, address } = req.body;
+        const { title, description, category, location } = req.body;
 
         // Validate required fields
         if (!title || !description || !category) {
             return res.status(400).json({ msg: 'Please provide title, description, and category' });
         }
 
+        // Parse location JSON
+        let parsedLocation = {
+            lat: null,
+            lng: null,
+            address: null
+        };
+
+        if (location) {
+            try {
+                const locationObj = JSON.parse(location);
+                parsedLocation = {
+                    lat: locationObj.lat ? parseFloat(locationObj.lat) : null,
+                    lng: locationObj.lng ? parseFloat(locationObj.lng) : null,
+                    address: locationObj.address || null
+                };
+            } catch (e) {
+                console.error('Error parsing location:', e);
+            }
+        }
+
         // Map category to department
         const department = getDepartmentFromCategory(category);
-
-        // Parse location
-        const location = {
-            lat: lat ? parseFloat(lat) : null,
-            lng: lng ? parseFloat(lng) : null,
-            address: address || null
-        };
 
         // Upload image to Cloudinary if provided
         let imageURL = '';
@@ -96,7 +109,7 @@ exports.createIssue = async (req, res) => {
             imageURL,
             category,
             department,  // Set department from category mapping
-            location,
+            location: parsedLocation,
             createdBy: req.user.id,
             assignedOfficer,
         });
@@ -107,6 +120,27 @@ exports.createIssue = async (req, res) => {
         const populatedIssue = await Issue.findById(issue._id)
             .populate('createdBy', 'name email')
             .populate('assignedOfficer', 'name email department');
+
+        // Award coins for creating an issue (100 coins)
+        try {
+            if (!issue.coinsAwarded.reported) {
+                const User = require('../models/User');
+                await User.findByIdAndUpdate(req.user.id, {
+                    $inc: { coins: 100 },
+                    $push: {
+                        notifications: {
+                            message: `You earned 100 Civic Points for reporting: ${issue.title}`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.reported = true;
+                await issue.save();
+            }
+        } catch (coinErr) {
+            console.error('Error awarding coins on report:', coinErr);
+        }
 
         res.status(201).json({
             msg: 'Issue created successfully',
@@ -275,7 +309,7 @@ exports.updateIssueStatus = async (req, res) => {
     try {
         const { status, comment } = req.body;
 
-        // Validate status
+        // Validate status value
         const validStatuses = ['Pending', 'In Progress', 'Resolved'];
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({
@@ -289,14 +323,78 @@ exports.updateIssueStatus = async (req, res) => {
             return res.status(404).json({ msg: 'Issue not found' });
         }
 
-        // Update status
+        const prevStatus = issue.status;
+
+        // No-op: same status
+        if (prevStatus === status) {
+            return res.status(200).json({ msg: 'Status is already ' + status, issue });
+        }
+
+        // Block updates on already-resolved issues
+        if (prevStatus === 'Resolved') {
+            return res.status(400).json({ msg: 'This issue is already resolved and cannot be updated further.' });
+        }
+
+        // Enforce forward-only transition: Pending → In Progress → Resolved
+        const allowedTransitions = {
+            'Pending':     'In Progress',
+            'In Progress': 'Resolved',
+        };
+
+        if (allowedTransitions[prevStatus] !== status) {
+            return res.status(400).json({
+                msg: `Invalid transition: "${prevStatus}" → "${status}". Allowed: Pending → In Progress → Resolved.`
+            });
+        }
+
+        // Apply status change
         issue.status = status;
+
+        // Award coins on "In Progress" (accepted)
+        if (status === 'In Progress' && !issue.coinsAwarded.accepted) {
+            issue.acceptedAt = new Date();
+            try {
+                const User = require('../models/User');
+                await User.findByIdAndUpdate(issue.createdBy, {
+                    $inc: { coins: 100 },
+                    $push: {
+                        notifications: {
+                            message: `Your report "${issue.title}" was accepted. You earned 100 Civic Points.`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.accepted = true;
+            } catch (coinErr) {
+                console.error('Error awarding coins on accept:', coinErr);
+            }
+        }
+
+        // Award coins on "Resolved"
+        if (status === 'Resolved' && !issue.coinsAwarded.resolved) {
+            issue.resolvedAt = new Date();
+            try {
+                const User = require('../models/User');
+                await User.findByIdAndUpdate(issue.createdBy, {
+                    $inc: { coins: 300 },
+                    $push: {
+                        notifications: {
+                            message: `Your report "${issue.title}" was resolved. You earned 300 Civic Points.`,
+                            type: 'coins',
+                            meta: { issueId: issue._id }
+                        }
+                    }
+                });
+                issue.coinsAwarded.resolved = true;
+            } catch (coinErr) {
+                console.error('Error awarding coins on resolve:', coinErr);
+            }
+        }
 
         // Add comment if provided
         if (comment && comment.trim()) {
-            if (!issue.comments) {
-                issue.comments = [];
-            }
+            if (!issue.comments) issue.comments = [];
             issue.comments.push({
                 by: req.user.id,
                 text: comment.trim(),
@@ -313,12 +411,84 @@ exports.updateIssueStatus = async (req, res) => {
             .populate('comments.by', 'name email');
 
         res.json({
-            msg: 'Issue status updated successfully',
+            msg: `Issue status updated to "${status}" successfully`,
             issue: updatedIssue
         });
     } catch (err) {
         console.error('Update Issue Status Error:', err);
         res.status(500).json({ msg: 'Server error while updating issue' });
+    }
+};
+
+
+/**
+ * Submit citizen feedback for a resolved issue
+ * @route POST /api/issues/:id/feedback
+ * @access Private (citizen – must be the creator)
+ */
+exports.submitFeedback = async (req, res) => {
+    try {
+        const { rating, comment } = req.body;
+
+        // Validate rating
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ msg: 'Rating must be between 1 and 5' });
+        }
+
+        const issue = await Issue.findById(req.params.id);
+        if (!issue) {
+            return res.status(404).json({ msg: 'Issue not found' });
+        }
+
+        // Only the citizen who created the issue can submit feedback
+        if (issue.createdBy.toString() !== req.user.id) {
+            return res.status(403).json({ msg: 'You can only submit feedback for your own issues' });
+        }
+
+        // Issue must be Resolved
+        if (issue.status !== 'Resolved') {
+            return res.status(400).json({ msg: 'Feedback can only be submitted for resolved issues' });
+        }
+
+        // Prevent duplicate feedback
+        if (issue.feedback && issue.feedback.submitted) {
+            return res.status(400).json({ msg: 'Feedback already submitted for this issue' });
+        }
+
+        // Save feedback
+        issue.feedback = {
+            submitted: true,
+            rating: Number(rating),
+            comment: comment ? comment.trim() : '',
+            submittedAt: new Date()
+        };
+
+        await issue.save();
+
+        res.json({ msg: 'Feedback submitted successfully', feedback: issue.feedback });
+    } catch (err) {
+        console.error('Submit Feedback Error:', err);
+        res.status(500).json({ msg: 'Server error while submitting feedback' });
+    }
+};
+
+/**
+ * Delete an issue (admin only)
+ * @route DELETE /api/issues/:id
+ * @access Private (admin)
+ */
+exports.deleteIssue = async (req, res) => {
+    try {
+        const issue = await Issue.findById(req.params.id);
+        if (!issue) {
+            return res.status(404).json({ msg: 'Issue not found' });
+        }
+
+        await Issue.findByIdAndDelete(req.params.id);
+        res.json({ msg: 'Issue deleted successfully' });
+    } catch (err) {
+        console.error('Delete Issue Error:', err);
+        res.status(500).json({ msg: 'Server error while deleting issue' });
     }
 };
 
