@@ -56,13 +56,13 @@ function FeedbackForm({ issue, onSubmitted }) {
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share your experience (optional)…"
                 rows={3}
-                className="w-full border-2 border-slate-200 bg-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none mb-4"
+                className="w-full border-2 border-slate-200 bg-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none mb-4"
             />
             {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
             <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-violet-600 to-purple-700 text-white font-semibold rounded-lg hover:from-violet-700 hover:to-purple-800 transition disabled:opacity-50"
             >
                 {submitting ? "Submitting…" : "Submit Feedback"}
             </button>
@@ -102,15 +102,16 @@ function AllMyIssues() {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-12">
-                <div className="max-w-6xl mx-auto flex items-center justify-between">
+            <div className="bg-slate-950 border-b border-white/5 text-white px-6 py-12 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                <div className="max-w-6xl mx-auto flex items-center justify-between relative z-10">
                     <div>
                         <h1 className="text-4xl font-bold mb-2">All Your Issues</h1>
-                        <p className="text-blue-100">Track and manage all issues you've reported</p>
+                        <p className="text-slate-400">Track and manage all issues you've reported</p>
                     </div>
                     <button
                         onClick={() => navigate("/citizen")}
-                        className="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition"
+                        className="bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-lg font-semibold transition backdrop-blur-md border border-white/10"
                     >
                         ← Back to Dashboard
                     </button>
@@ -122,10 +123,10 @@ function AllMyIssues() {
                 <div className="mb-8 flex gap-3 flex-wrap">
                     <button
                         onClick={() => setFilter("all")}
-                        className={`px-4 py-2 rounded-lg font-semibold transition ${
+                        className={`px-4 py-2 rounded-lg font-bold transition shadow-sm ${
                             filter === "all"
-                                ? "bg-blue-600 text-white"
-                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-400"
+                                ? "bg-orange-600 text-white shadow-orange-500/20"
+                                : "bg-white text-slate-600 border-2 border-slate-100 hover:border-orange-200"
                         }`}
                     >
                         All ({issues.length})
@@ -165,7 +166,7 @@ function AllMyIssues() {
                 {/* Loading State */}
                 {loading ? (
                     <div className="text-center py-16">
-                        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto animate-spin mb-4"></div>
+                        <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full mx-auto animate-spin mb-4"></div>
                         <p className="text-slate-600 text-lg">Loading issues...</p>
                     </div>
                 ) : filteredIssues.length === 0 ? (
@@ -219,7 +220,7 @@ function AllMyIssues() {
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 pb-4 border-t border-slate-100 pt-4">
                                             <div>
                                                 <p className="font-semibold text-slate-900">Category</p>
-                                                <p className="text-blue-600 font-medium">{issue.category}</p>
+                                                <p className="text-violet-600 font-medium">{issue.category}</p>
                                             </div>
                                             {issue.location?.address && (
                                                 <div>
@@ -238,7 +239,7 @@ function AllMyIssues() {
                                             <div>
                                                 <p className="font-semibold text-slate-900">Officer</p>
                                                 {issue.assignedOfficer?.name ? (
-                                                    <p className="text-blue-600 font-medium flex items-center gap-1">
+                                                    <p className="text-violet-600 font-medium flex items-center gap-1">
                                                         👤 {issue.assignedOfficer.name}
                                                     </p>
                                                 ) : (
@@ -251,7 +252,7 @@ function AllMyIssues() {
                                         {issue.assignedOfficer?._id && (
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/chat/${issue._id}`); }}
-                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transition shadow-sm w-fit"
+                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-500 to-amber-600 text-white text-sm font-bold rounded-lg hover:from-orange-600 hover:to-amber-700 transition shadow-lg shadow-orange-500/10 w-fit"
                                             >
                                                 💬 Chat with Officer
                                             </button>

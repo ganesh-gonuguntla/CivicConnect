@@ -29,17 +29,17 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Card */}
                 <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                     {/* Header gradient */}
-                    <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-8 py-12 text-center">
+                    <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 px-8 py-12 text-center">
                         <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center">
                             <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-10 h-10" />
                         </div>
                         <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-                        <p className="text-blue-100">Sign in to your CivicConnect account</p>
+                        <p className="text-purple-100">Sign in to your CivicConnect account</p>
                     </div>
 
                     {/* Form */}
@@ -51,7 +51,7 @@ function Login() {
                                 placeholder="you@example.com"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full border-2 border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                className="w-full border-2 border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition"
                                 required
                             />
                         </div>
@@ -63,7 +63,7 @@ function Login() {
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full border-2 border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                                className="w-full border-2 border-slate-200 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-200 transition"
                                 required
                             />
                         </div>
@@ -71,9 +71,9 @@ function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition duration-200 font-semibold disabled:opacity-50"
+                            className="w-full bg-gradient-to-r from-orange-500 to-amber-600 text-white py-3 rounded-lg hover:from-orange-600 hover:to-amber-700 transition duration-200 font-semibold shadow-lg shadow-orange-500/20 disabled:opacity-50 mt-6"
                         >
-                            {loading ? "Signing in..." : "Sign in"}
+                            {loading ? "Signing in..." : "Sign In"}
                         </button>
 
                         <div className="relative my-6">
@@ -103,10 +103,10 @@ function Login() {
 
                     {/* Footer */}
                     <div className="px-8 py-6 bg-slate-50 border-t border-slate-200 text-center">
-                        <p className="text-slate-600 text-sm">
+                        <p className="text-slate-500 text-sm">
                             Don't have an account?{" "}
-                            <Link to="/register" className="font-semibold text-blue-600 hover:text-blue-700 transition">
-                                Sign up here
+                            <Link to="/register" className="font-semibold text-orange-600 hover:text-orange-700 transition">
+                                Create one here
                             </Link>
                         </p>
                     </div>

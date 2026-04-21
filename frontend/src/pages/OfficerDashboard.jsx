@@ -51,7 +51,7 @@ function LocationBadge({ location }) {
                     href={mapsUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-blue-600 underline underline-offset-2 hover:text-blue-800 font-medium truncate"
+                    className="text-violet-600 underline underline-offset-2 hover:text-violet-800 font-medium truncate"
                 >
                     {address || label}
                     {hasCoords && address && (
@@ -129,9 +129,10 @@ function OfficerDashboard() {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white px-8 py-8 shadow-lg">
-                <h1 className="text-4xl font-bold mb-2">👮 Officer Dashboard</h1>
-                <p className="text-blue-200 text-lg">
+            <div className="bg-slate-950 text-white px-8 py-10 shadow-xl border-b border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                <h1 className="text-4xl font-bold mb-2 relative z-10">👮 Officer Dashboard</h1>
+                <p className="text-slate-400 text-lg relative z-10">
                     {user?.department} Department • {user?.name}
                 </p>
             </div>
@@ -140,7 +141,7 @@ function OfficerDashboard() {
             <div className="px-8 py-8 max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
                     {[
-                        { label: "Total Assigned", val: counts.all, color: "from-blue-500 to-blue-600", icon: "📊" },
+                        { label: "Total Assigned", val: counts.all, color: "from-orange-500 to-amber-600", icon: "📊" },
                         { label: "Pending", val: counts.Pending, color: "from-red-500 to-red-600", icon: "⏳" },
                         { label: "In Progress", val: counts["In Progress"], color: "from-amber-500 to-amber-600", icon: "🔄" },
                         { label: "Resolved", val: counts.Resolved, color: "from-emerald-500 to-emerald-600", icon: "✅" },
@@ -159,9 +160,9 @@ function OfficerDashboard() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${filter === f
-                                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
-                                    : "bg-white text-slate-600 border-2 border-slate-200 hover:border-blue-400 hover:text-blue-600"
+                            className={`px-5 py-2 rounded-lg text-sm font-bold transition-all ${filter === f
+                                    ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/20"
+                                    : "bg-white text-slate-600 border-2 border-slate-100 hover:border-orange-200"
                                 }`}
                         >
                             {f === "all" ? `All (${counts.all})` : `${f} (${counts[f]})`}
@@ -258,8 +259,8 @@ function OfficerDashboard() {
                                                 📝 Progress Notes
                                             </p>
                                             {issue.comments.map((c, i) => (
-                                                <div key={i} className="text-xs text-slate-600 border-l-3 border-blue-400 pl-3">
-                                                    <span className="font-semibold text-blue-600">
+                                                <div key={i} className="text-xs text-slate-600 border-l-3 border-violet-400 pl-3">
+                                                    <span className="font-semibold text-violet-600">
                                                         {c.by?.name || "Officer"}
                                                     </span>
                                                     <span className="text-slate-400"> · {new Date(c.at).toLocaleString("en-IN", {
@@ -279,7 +280,7 @@ function OfficerDashboard() {
                                             setComment({ ...comment, [issue._id]: e.target.value })
                                         }
                                         rows={2}
-                                        className="w-full border-2 border-slate-200 bg-slate-50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+                                        className="w-full border-2 border-slate-200 bg-slate-50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 resize-none"
                                     />
 
                                     {/* Action buttons */}
@@ -303,7 +304,7 @@ function OfficerDashboard() {
                                     {/* Chat with citizen */}
                                     <button
                                         onClick={() => navigate(`/chat/${issue._id}`)}
-                                        className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-bold hover:from-blue-700 hover:to-cyan-700 transition flex items-center justify-center gap-2 shadow-sm"
+                                        className="w-full py-3 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 text-white text-sm font-bold hover:from-orange-600 hover:to-amber-700 transition flex items-center justify-center gap-2 shadow-lg shadow-orange-500/10"
                                     >
                                         💬 Chat with Citizen
                                     </button>

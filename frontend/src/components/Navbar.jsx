@@ -12,21 +12,21 @@ function Navbar() {
     };
 
     return (
-        <nav className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 shadow-xl px-6 py-4 flex justify-between items-center">
+        <nav className="bg-slate-950 border-b border-white/5 shadow-xl px-6 py-4 flex justify-between items-center">
             <div className="flex space-x-3 items-center">
                 {user && user.role === 'citizen' && <HamburgerMenu />}
                 <div className="flex items-center space-x-3">
-                    <div className="bg-gradient-to-br from-blue-400 to-cyan-400 p-2 rounded-lg">
+                    <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-lg shadow-lg shadow-orange-500/20">
                         <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-6 h-6" />
                     </div>
-                    <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">CivicConnect</h1>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-300 bg-clip-text text-transparent">CivicConnect</h1>
                 </div>
             </div>
             <div className="flex items-center space-x-6">
                 {!user ? (
                     <>
-                        <Link to="/login" className="text-slate-300 hover:text-white font-medium transition duration-200">Login</Link>
-                        <Link to="/register" className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-5 py-2 rounded-lg hover:from-emerald-600 hover:to-teal-600 transition duration-200 font-medium">Register</Link>
+                        <Link to="/login" className="text-slate-400 hover:text-white font-medium transition duration-200">Login</Link>
+                        <Link to="/register" className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-5 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 transition duration-200 font-semibold shadow-lg shadow-orange-500/20">Register</Link>
                     </>
                 ) : (
                     <>

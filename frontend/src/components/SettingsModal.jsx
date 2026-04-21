@@ -58,30 +58,32 @@ function SettingsModal({ onClose }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-            <div ref={modalRef} className="bg-purple-50 rounded-lg max-w-md w-full p-6">
-                <div className="flex justify-between items-center mb-4">
-                    <h3 className="text-lg font-semibold text-purple-700">Settings</h3>
-                    <button onClick={onClose}>✕</button>
+            <div ref={modalRef} className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200">
+                <div className="flex justify-between items-center bg-slate-950 px-6 py-4 text-white">
+                    <h3 className="text-lg font-bold text-white px-1 border-l-4 border-orange-500">Settings</h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white transition">✕</button>
                 </div>
 
-                {msg && <p className={`mb-3 ${msg.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{msg}</p>}
+                <div className="p-6">
+                    {msg && <p className={`mb-3 ${msg.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{msg}</p>}
 
-                <form onSubmit={handleSubmit} className="space-y-3">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">Username</label>
-                        <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border p-2 rounded" />
-                    </div>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Username</label>
+                            <input value={name} onChange={(e) => setName(e.target.value)} className="w-full border border-slate-300 p-2 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700">New Password</label>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border p-2 rounded" placeholder="Leave empty to keep current password" />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">New Password</label>
+                            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full border border-slate-300 p-2 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none" placeholder="Leave empty to keep current password" />
+                        </div>
 
-                    <div className="flex justify-end gap-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 rounded bg-gray-200">Cancel</button>
-                        <button type="submit" disabled={loading} className="px-4 py-2 rounded bg-purple-700 text-white">{loading ? 'Saving...' : 'Save'}</button>
-                    </div>
-                </form>
+                        <div className="flex justify-end gap-2 pt-2">
+                            <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition">Cancel</button>
+                            <button type="submit" disabled={loading} className="px-6 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold hover:from-orange-600 hover:to-amber-700 shadow-lg shadow-orange-500/20 transition disabled:opacity-50">{loading ? 'Saving...' : 'Save Changes'}</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );

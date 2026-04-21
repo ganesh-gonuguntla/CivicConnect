@@ -4,7 +4,8 @@ function PendingVerification() {
     const { user, logout } = useAuth();
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4">
+        <div className="min-h-screen bg-slate-950 flex items-center justify-center px-4 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-orange-500/10 pointer-events-none"></div>
             <div className="bg-white rounded-2xl shadow-2xl p-10 max-w-md w-full">
                 {/* Header */}
                 <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl p-6 mb-8 text-center">
@@ -36,7 +37,7 @@ function PendingVerification() {
                 )}
 
                 {/* Info note */}
-                <div className="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4 mb-8 text-sm text-slate-700">
+                <div className="bg-violet-50 border-l-4 border-violet-500 rounded-lg p-4 mb-8 text-sm text-slate-700">
                     <p className="font-semibold mb-2">📬 What Happens Next?</p>
                     <p className="text-slate-600 text-sm">
                         Our admin team will review your information. Once approved, simply sign in again and you'll access the Officer Dashboard.

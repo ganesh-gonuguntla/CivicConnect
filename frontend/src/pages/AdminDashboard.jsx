@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { getAllIssues, getPendingOfficers, updateOfficerStatus, deleteIssue } from "../services/api";
 import { PieChart, Pie, Cell, Legend, BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts";
 
-const COLORS = ["#60a5fa", "#fbbf24", "#34d399", "#f87171"];
+const COLORS = ["#8b5cf6", "#fbbf24", "#10b981", "#f87171"];
 
 /* ── tiny toast component ──────────────────────────────────────── */
 function Toast({ msg, type, onClose }) {
@@ -16,7 +16,7 @@ function Toast({ msg, type, onClose }) {
             ? "bg-green-600"
             : type === "error"
                 ? "bg-red-600"
-                : "bg-blue-600";
+                : "bg-violet-600";
 
     return (
         <div
@@ -33,8 +33,8 @@ function Toast({ msg, type, onClose }) {
 
 /* ── department color map ───────────────────────────────────────── */
 const deptColor = {
-    Roads: "bg-blue-100 text-blue-700",
-    Water: "bg-cyan-100 text-cyan-700",
+    Roads: "bg-violet-100 text-violet-700",
+    Water: "bg-fuchsia-100 text-fuchsia-700",
     Sanitation: "bg-purple-100 text-purple-700",
     Electricity: "bg-yellow-100 text-yellow-700",
 };
@@ -138,9 +138,10 @@ function AdminDashboard() {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* ── Header ── */}
-            <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white px-8 py-8 shadow-lg">
-                <h1 className="text-4xl font-bold tracking-tight mb-2">⚙️ Admin Dashboard</h1>
-                <p className="text-blue-200">
+            <div className="bg-slate-950 text-white px-8 py-10 shadow-xl border-b border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+                <h1 className="text-4xl font-bold tracking-tight mb-2 relative z-10">⚙️ Admin Dashboard</h1>
+                <p className="text-slate-400 relative z-10">
                     CivicConnect · Manage all issues & officer accounts
                 </p>
             </div>
@@ -152,8 +153,8 @@ function AdminDashboard() {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={`relative flex items-center gap-2 px-5 py-4 text-sm font-semibold border-b-2 transition-colors ${activeTab === tab.id
-                                    ? "border-blue-600 text-blue-600"
+                            className={`relative flex items-center gap-2 px-5 py-4 text-sm font-bold border-b-2 transition-colors ${activeTab === tab.id
+                                    ? "border-orange-500 text-orange-600"
                                     : "border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300"
                                 }`}
                         >
@@ -176,9 +177,9 @@ function AdminDashboard() {
                     <div className="space-y-8">
                         {/* Stat cards */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg rounded-xl p-6 border-l-4 border-blue-700 text-white">
-                                <h3 className="text-blue-100 text-sm font-semibold uppercase tracking-wide">Total Issues</h3>
-                                <p className="text-5xl font-bold mt-3">{stats.total}</p>
+                            <div className="bg-gradient-to-br from-orange-500 to-amber-600 shadow-lg rounded-xl p-6 border-l-4 border-orange-700 text-white">
+                                <h3 className="text-orange-100 text-sm font-bold uppercase tracking-wide">Total Issues</h3>
+                                <p className="text-5xl font-black mt-3">{stats.total}</p>
                             </div>
                             <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg rounded-xl p-6 border-l-4 border-emerald-700 text-white">
                                 <h3 className="text-emerald-100 text-sm font-semibold uppercase tracking-wide">Resolved</h3>
@@ -255,7 +256,7 @@ function AdminDashboard() {
                                         <tr key={i._id} className="border-b border-slate-200 transition hover:bg-slate-50">
                                             <td className="py-4 px-5 text-slate-900 font-semibold">{i.title}</td>
                                             <td className="py-4 px-5">
-                                                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-xs font-bold">
+                                                <span className="bg-violet-100 text-violet-700 px-3 py-1 rounded-lg text-xs font-bold">
                                                     {i.category}
                                                 </span>
                                             </td>

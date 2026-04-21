@@ -382,7 +382,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
             className={
                 embedded
                     ? "space-y-6"
-                    : "bg-gradient-to-br from-blue-50 to-slate-50 shadow-lg p-8 rounded-2xl space-y-6 max-h-[80vh] overflow-y-auto"
+                    : "bg-slate-50 shadow-lg p-8 rounded-2xl space-y-6 max-h-[80vh] overflow-y-auto border border-slate-200"
             }
         >
             {msg && (
@@ -406,7 +406,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                         placeholder="Brief title of the issue"
                         value={form.title}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
                         required
                     />
                 </div>
@@ -432,7 +432,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                         name="category"
                         value={form.category}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
                         required
                     >
                         <option value="">Select a category</option>
@@ -468,7 +468,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                             placeholder="Search location (e.g., 'Main Street')"
                             value={searchQuery}
                             onChange={(e) => handleLocationSearch(e.target.value)}
-                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
                         />
                         
                         {/* Search Results Dropdown */}
@@ -479,7 +479,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                                         key={index}
                                         type="button"
                                         onClick={() => handleSelectLocation(result)}
-                                        className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-100 last:border-0 transition"
+                                        className="w-full text-left px-4 py-3 hover:bg-violet-50 border-b border-slate-100 last:border-0 transition"
                                     >
                                         <div className="font-semibold text-slate-900">{result.name}</div>
                                         <div className="text-slate-500 text-xs">{result.display_name}</div>
@@ -493,7 +493,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                     <button
                         type="button"
                         onClick={handleCurrentLocation}
-                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold px-4 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition mb-4"
+                        className="w-full bg-slate-950 text-white font-bold px-4 py-3 rounded-lg hover:bg-black transition shadow-lg mb-4 flex items-center justify-center gap-2"
                     >
                         📡 Use Current Location
                     </button>
@@ -501,7 +501,7 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                     {/* Map Display */}
                     {showMap && form.location.lat && form.location.lng && (
                         <div className="mt-4">
-                            <p className="text-xs text-slate-600 mb-3 bg-blue-50 p-3 rounded-lg">
+                            <p className="text-xs text-slate-600 mb-3 bg-violet-50 p-3 rounded-lg">
                                 💡 <strong>Tip:</strong> Drag the marker to move • Click on map to reposition • Use +/- or scroll to zoom
                             </p>
                             <div
@@ -544,13 +544,13 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                                     <button
                                         type="button"
                                         onClick={() => setUseCamera(true)}
-                                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold px-4 py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition"
+                                        className="w-full bg-slate-100 text-slate-700 font-bold px-4 py-3 rounded-lg hover:bg-slate-200 transition border-2 border-slate-200"
                                     >
                                         📹 Take Photo with Camera
                                     </button>
                                     
                                     {/* File Upload Option */}
-                                    <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-500 hover:bg-blue-50 transition cursor-pointer">
+                                    <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-violet-500 hover:bg-violet-50 transition cursor-pointer">
                                         <label className="block cursor-pointer">
                                             <input
                                                 type="file"
@@ -597,10 +597,10 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className={`w-full font-bold py-3 px-6 rounded-lg transition-all ${
+                    className={`w-full font-bold py-4 px-6 rounded-lg transition-all shadow-xl ${
                         form.title && form.description && form.category && form.location.lat && form.location.lng && form.image && !loading
-                            ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg"
-                            : "bg-slate-200 text-slate-500 cursor-not-allowed"
+                            ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-orange-500/20"
+                            : "bg-slate-200 text-slate-500 cursor-not-allowed shadow-none"
                     }`}
                     disabled={!form.title || !form.description || !form.category || !form.location.lat || !form.location.lng || !form.image || loading}
                 >

@@ -12,7 +12,7 @@ const SOCKET_URL = 'http://localhost:3000';
 function Ticks({ deliveredAt, readAt }) {
     if (readAt) {
         return (
-            <span className="inline-flex" title="Seen" style={{ color: '#60a5fa' }}>
+            <span className="inline-flex" title="Seen" style={{ color: '#a78bfa' }}>
                 <svg width="16" height="11" viewBox="0 0 16 11" fill="currentColor">
                     <path d="M11.071.929a1 1 0 0 1 0 1.414L5.414 8 3 5.586A1 1 0 0 1 4.414 4.172L5.414 5.172 9.657.929a1 1 0 0 1 1.414 0z"/>
                     <path d="M15.071.929a1 1 0 0 1 0 1.414L9.414 8 8 6.586l5.657-5.657a1 1 0 0 1 1.414 0z"/>
@@ -318,7 +318,7 @@ function ChatPage() {
     const department = issueInfo?.department || '';
 
     return (
-        <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-blue-50 overflow-hidden">
+        <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 to-purple-50 overflow-hidden">
 
             {/* Notification toast */}
             {notification && (
@@ -326,19 +326,20 @@ function ChatPage() {
             )}
 
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-700 text-white px-4 py-4 flex items-center gap-3 shadow-lg flex-shrink-0">
+            <div className="bg-slate-950 text-white px-4 py-4 flex items-center gap-3 shadow-xl border-b border-white/5 flex-shrink-0 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
                 <button
                     onClick={() => navigate(-1)}
-                    className="w-9 h-9 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition"
+                    className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition border border-white/10 relative z-10"
                 >
                     ← Back
                 </button>
-                <div className="w-10 h-10 rounded-full bg-white/30 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center font-bold text-lg flex-shrink-0 shadow-lg shadow-orange-500/20 relative z-10">
                     {otherName.charAt(0).toUpperCase()}
                 </div>
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 relative z-10">
                     <p className="font-bold text-base leading-tight truncate">💬 {otherName}</p>
-                    <p className="text-xs text-blue-100 truncate">
+                    <p className="text-xs text-slate-400 truncate">
                         {issueTitle}{department ? ` · ${department} Dept` : ''}
                     </p>
                 </div>
@@ -348,7 +349,7 @@ function ChatPage() {
             <div className="flex-1 overflow-y-auto px-4 py-4">
                 {loading && (
                     <div className="text-center py-12">
-                        <div className="inline-block w-8 h-8 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin" />
+                        <div className="inline-block w-8 h-8 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
                         <p className="text-slate-400 text-sm mt-2">Loading messages…</p>
                     </div>
                 )}
@@ -409,7 +410,7 @@ function ChatPage() {
                         />
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-10 h-10 rounded-full bg-slate-100 hover:bg-blue-100 flex items-center justify-center text-slate-500 hover:text-blue-600 transition flex-shrink-0"
+                            className="w-10 h-10 rounded-full bg-slate-100 hover:bg-violet-100 flex items-center justify-center text-slate-500 hover:text-violet-600 transition flex-shrink-0"
                             title="Attach image or video"
                         >
                             📎
@@ -423,13 +424,13 @@ function ChatPage() {
                     onChange={e => editingMsg ? setEditText(e.target.value) : setText(e.target.value)}
                     onKeyDown={handleKey}
                     placeholder={editingMsg ? 'Edit your message…' : 'Type a message…'}
-                    className="flex-1 resize-none rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100 max-h-32 overflow-y-auto transition"
+                    className="flex-1 resize-none rounded-2xl border-2 border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 max-h-32 overflow-y-auto transition"
                 />
 
                 <button
                     onClick={editingMsg ? handleEdit : handleSend}
                     disabled={uploading || (editingMsg ? !editText.trim() : (!text.trim() && !mediaFile))}
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-white flex items-center justify-center flex-shrink-0 hover:from-blue-700 hover:to-blue-800 disabled:opacity-40 transition shadow-md"
+                    className="w-10 h-10 rounded-full bg-gradient-to-r from-orange-500 to-amber-600 text-white flex items-center justify-center flex-shrink-0 hover:from-orange-600 hover:to-amber-700 disabled:opacity-40 transition shadow-lg shadow-orange-500/20"
                 >
                     {uploading ? (
                         <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">

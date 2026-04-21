@@ -51,18 +51,18 @@ function CitizenDashboard() {
     return (
         <div className="min-h-screen bg-slate-50">
             {/* Hero Section */}
-            <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-cyan-700 text-white px-6 py-16 relative overflow-hidden">
+            <div className="bg-gradient-to-r from-violet-700 via-purple-600 to-fuchsia-700 text-white px-6 py-16 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-white"></div>
                 </div>
                 <div className="max-w-4xl mx-auto relative z-10">
                     <h1 className="text-5xl font-bold mb-4">Make Your City Better</h1>
-                    <p className="text-lg text-blue-100 mb-8 max-w-2xl">
+                    <p className="text-lg text-purple-100 mb-8 max-w-2xl">
                         Report civic issues in your community. Every issue you report helps improve our city.
                     </p>
                     <button
                         onClick={() => setShowModal(true)}
-                        className="bg-white text-blue-700 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition duration-200 shadow-lg inline-flex items-center gap-2"
+                        className="bg-gradient-to-r from-orange-500 to-amber-600 text-white font-bold px-8 py-4 rounded-xl hover:from-orange-600 hover:to-amber-700 transition duration-200 shadow-xl shadow-orange-500/20 inline-flex items-center gap-2"
                     >
                         <span className="text-2xl">+</span>
                         Report a New Issue
@@ -72,13 +72,13 @@ function CitizenDashboard() {
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-                        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-6 flex justify-between items-center">
+                        <div className="sticky top-0 bg-slate-950 px-6 py-6 flex justify-between items-center border-b border-white/5">
                             <h3 className="text-2xl font-bold text-white">Report a Civic Issue</h3>
                             <button
                                 onClick={handleCloseModal}
-                                className="text-white hover:text-blue-100 text-3xl font-light"
+                                className="text-slate-400 hover:text-white text-3xl font-light transition"
                             >
                                 ✕
                             </button>
@@ -94,9 +94,9 @@ function CitizenDashboard() {
             <div className="max-w-6xl mx-auto px-6 py-12">
                 {/* Stats Bar */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
-                    <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500">
+                    <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-violet-500">
                         <p className="text-slate-600 text-sm font-medium">Total Reported</p>
-                        <p className="text-4xl font-bold text-blue-600 mt-2">{issues.length}</p>
+                        <p className="text-4xl font-bold text-violet-600 mt-2">{issues.length}</p>
                     </div>
                     <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-emerald-500">
                         <p className="text-slate-600 text-sm font-medium">Resolved</p>
@@ -115,9 +115,9 @@ function CitizenDashboard() {
                         {issues.length > 3 && (
                             <button
                                 onClick={() => navigate("/my-issues")}
-                                className="text-blue-600 hover:text-blue-700 font-semibold"
+                                className="text-orange-600 hover:text-orange-700 font-bold flex items-center gap-1 transition"
                             >
-                                View All ({issues.length})
+                                View All ({issues.length}) →
                             </button>
                         )}
                     </div>
@@ -161,7 +161,7 @@ function CitizenDashboard() {
                                             </span>
                                             
                                             <div className="flex items-center justify-between text-xs text-slate-600">
-                                                <span className="bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                                                <span className="bg-violet-100 text-violet-700 px-2 py-1 rounded">
                                                     {issue.category}
                                                 </span>
                                                 {issue.location?.address && (

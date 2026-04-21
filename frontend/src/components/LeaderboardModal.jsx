@@ -28,12 +28,13 @@ function LeaderboardModal({ onClose }) {
         <div className="fixed inset-0 flex items-center justify-center z-[60] bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-purple-50 rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-purple-700 to-indigo-600 p-6 flex justify-between items-center text-white">
-                    <div>
+                <div className="bg-slate-950 p-6 flex justify-between items-center text-white relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
+                    <div className="relative z-10">
                         <h2 className="text-3xl font-extrabold tracking-tight">Global Leaderboard</h2>
-                        <p className="text-purple-100 text-sm mt-1">Top 10 Civic Pointers Worldwide</p>
+                        <p className="text-slate-400 text-sm mt-1">Top 10 Civic Pointers Worldwide</p>
                     </div>
-                    <button onClick={onClose} className="text-white hover:bg-purple-50/20 p-2 rounded-full transition-colors">
+                    <button onClick={onClose} className="text-white hover:bg-white/10 p-2 rounded-full transition-colors relative z-10">
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -74,8 +75,8 @@ function LeaderboardModal({ onClose }) {
                                     return (
                                         <div key={user._id} className={`grid grid-cols-12 gap-4 px-6 py-4 items-center transition-colors ${
                                             isMe 
-                                            ? 'bg-purple-100 bg-opacity-80 border-l-4 border-purple-600 hover:bg-purple-200' 
-                                            : 'bg-purple-50 hover:bg-gray-50 border-l-4 border-transparent'
+                                            ? 'bg-orange-50 border-l-4 border-orange-500 hover:bg-orange-100' 
+                                            : 'bg-white hover:bg-slate-50 border-l-4 border-transparent'
                                         }`}>
                                             <div className="col-span-2 text-center flex justify-center items-center h-8">
                                                 {rankDisplay}
@@ -84,7 +85,7 @@ function LeaderboardModal({ onClose }) {
                                                 {user.name} 
                                                 {isMe && <span className="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wide">You</span>}
                                             </div>
-                                            <div className="col-span-3 text-right font-extrabold text-indigo-600 text-lg">
+                                            <div className="col-span-3 text-right font-extrabold text-orange-600 text-lg">
                                                 {(user.coins || 0).toLocaleString()}
                                             </div>
                                         </div>
@@ -103,15 +104,15 @@ function LeaderboardModal({ onClose }) {
                                             <span className="px-3 bg-gray-50 text-xs font-bold uppercase tracking-wider text-gray-400">Your Standing</span>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-12 gap-4 px-4 py-4 items-center bg-purple-100 shadow-md rounded-xl border-l-4 border-purple-600 transform hover:scale-[1.02] transition-transform duration-200">
+                                    <div className="grid grid-cols-12 gap-4 px-4 py-4 items-center bg-orange-50 shadow-md rounded-xl border-l-4 border-orange-500 transform hover:scale-[1.02] transition-transform duration-200">
                                         <div className="col-span-2 text-center flex justify-center items-center h-8">
-                                            <span className="text-purple-800 font-bold text-lg">#{currentUser.rank}</span>
+                                            <span className="text-orange-900 font-bold text-lg">#{currentUser.rank}</span>
                                         </div>
-                                        <div className="col-span-7 font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                        <div className="col-span-7 font-bold text-slate-800 flex items-center gap-2 text-lg">
                                             {currentUser.name}
-                                            <span className="text-[10px] bg-purple-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wide shadow-sm">You</span>
+                                            <span className="text-[10px] bg-orange-600 text-white px-2 py-0.5 rounded-full uppercase tracking-wide shadow-sm">You</span>
                                         </div>
-                                        <div className="col-span-3 text-right font-extrabold text-indigo-600 text-lg">
+                                        <div className="col-span-3 text-right font-extrabold text-orange-600 text-lg">
                                             {(currentUser.coins || 0).toLocaleString()}
                                         </div>
                                     </div>
