@@ -6,13 +6,15 @@ import AllMyIssues from './pages/AllMyIssues';
 import OfficerDashboard from './pages/OfficerDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import PendingVerification from './pages/PendingVerification';
+import ChatPage from './pages/ChatPage';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const location = useLocation();
   const hideNavbarRoutes = ['/login', '/register', '/'];
-  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname);
+  const shouldShowNavbar = !hideNavbarRoutes.includes(location.pathname)
+    && !location.pathname.startsWith('/chat');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -54,6 +56,14 @@ function App() {
           element={
             <ProtectedRoute role="admin">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat/:issueId"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           }
         />

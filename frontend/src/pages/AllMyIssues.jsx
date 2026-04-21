@@ -231,13 +231,29 @@ function AllMyIssues() {
                                                 </p>
                                             </div>
                                         )}
-                                        {issue.department?.name && (
-                                            <div>
-                                                <p className="font-semibold text-gray-800">Department</p>
-                                                <p className="text-gray-700">{issue.department.name}</p>
-                                            </div>
-                                        )}
+                                        <div>
+                                            <p className="font-semibold text-gray-800">Assigned Officer</p>
+                                            {issue.assignedOfficer?.name ? (
+                                                <p className="text-purple-700 font-medium flex items-center gap-1">
+                                                    <span>👤</span> {issue.assignedOfficer.name}
+                                                </p>
+                                            ) : (
+                                                <p className="text-gray-400 italic">Unassigned</p>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {/* Chat button */}
+                                    {issue.assignedOfficer?._id && (
+                                        <div className="mt-3 pt-3 border-t border-purple-100">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); navigate(`/chat/${issue._id}`); }}
+                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-violet-700 hover:to-purple-700 transition shadow-sm"
+                                            >
+                                                💬 Chat with Officer
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>

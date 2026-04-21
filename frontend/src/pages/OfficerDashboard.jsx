@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { getAssignedIssues, updateIssueStatus } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 
@@ -69,6 +70,7 @@ function LocationBadge({ location }) {
 ══════════════════════════════════════════════════════════════ */
 function OfficerDashboard() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [issues, setIssues] = useState([]);
     const [fetching, setFetching] = useState(true);
     const [comment, setComment] = useState({});
@@ -297,6 +299,14 @@ function OfficerDashboard() {
                                             onClick={() => handleStatusChange(issue._id, "Resolved")}
                                         />
                                     </div>
+
+                                    {/* Chat with citizen */}
+                                    <button
+                                        onClick={() => navigate(`/chat/${issue._id}`)}
+                                        className="w-full mt-1 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs font-bold hover:from-violet-700 hover:to-purple-700 transition flex items-center justify-center gap-1.5 shadow-sm"
+                                    >
+                                        💬 Chat with Citizen
+                                    </button>
                                 </div>
                             );
                         })}

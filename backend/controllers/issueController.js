@@ -92,14 +92,57 @@ exports.createIssue = async (req, res) => {
             }
         }
 
-        // Auto-assign officer from department
+        // Auto-assign officer from department using least-loaded algorithm
+        const User = require('../models/User');
         const dept = await Department.findOne({ name: department }).populate('officers');
 
+        // Fallback: if Department doc is missing or has no officers, query User directly
+        let officerList = dept?.officers || [];
+        if (officerList.length === 0) {
+            console.warn(`[Assignment] Dept "${department}" has no officers in Dept collection — falling back to User query`);
+            officerList = await User.find({ role: 'officer', department, status: 'approved', verified: true }).select('_id');
+        }
+
         let assignedOfficer = null;
-        if (dept && dept.officers && dept.officers.length > 0) {
-            // Randomly assign to an officer in the department
-            const randomIndex = Math.floor(Math.random() * dept.officers.length);
-            assignedOfficer = dept.officers[randomIndex]._id;
+        if (officerList.length > 0) {
+            // Count active (non-Resolved) issues per officer, pick the one with fewest
+            const officerIds = officerList.map(o => o._id);
+
+            // Aggregate active issue counts per officer
+            const issueCounts = await Issue.aggregate([
+                {
+                    $match: {
+                        assignedOfficer: { $in: officerIds },
+                        status: { $ne: 'Resolved' }
+                    }
+                },
+                {
+                    $group: {
+                        _id: '$assignedOfficer',
+                        count: { $sum: 1 }
+                    }
+                }
+            ]);
+
+            // Build a count map for quick lookup
+            const countMap = {};
+            issueCounts.forEach(entry => {
+                countMap[entry._id.toString()] = entry.count;
+            });
+
+            // Find the officer with the minimum active issue count
+            let minCount = Infinity;
+            let selectedOfficer = null;
+            for (const officer of officerList) {
+                const count = countMap[officer._id.toString()] || 0;
+                if (count < minCount) {
+                    minCount = count;
+                    selectedOfficer = officer._id;
+                }
+            }
+            assignedOfficer = selectedOfficer;
+
+            console.log(`[Assignment] Dept: ${department} | Officer: ${selectedOfficer} | Active issues: ${minCount}`);
         }
 
         // Create issue
@@ -159,21 +202,21 @@ exports.createIssue = async (req, res) => {
  */
 exports.getAssignedIssues = async (req, res) => {
     try {
-        console.log("req.user:", req.user);
-
-        const officerDept = req.currentUser.department; // ✅ correct source
+        const officerId = req.user.id;
+        const officerDept = req.currentUser.department;
 
         if (!officerDept) {
             console.warn("Officer has no department:", req.currentUser);
             return res.status(400).json({ msg: "No department assigned" });
         }
 
-        const issues = await Issue.find({ department: officerDept })
+        // Only show issues directly assigned to this officer
+        const issues = await Issue.find({ assignedOfficer: officerId })
             .populate("createdBy", "name email")
             .populate("assignedOfficer", "name email department")
             .sort({ createdAt: -1 });
 
-        console.log("Found issues:", issues.length);
+        console.log(`[Officer ${officerId}] Assigned issues: ${issues.length}`);
         res.json(issues);
     } catch (err) {
         console.error("Get Assigned Issues Error:", err);
@@ -209,14 +252,8 @@ exports.getIssues = async (req, res) => {
             // Citizens see only their own issues
             query.createdBy = req.user.id;
         } else if (role === 'officer') {
-            // Officers see issues in their department
-            const officerDept = req.currentUser.department; // ✅ use currentUser
-            if (officerDept) {
-                query.department = officerDept;
-            } else {
-                // Fallback: issues assigned directly to them
-                query.assignedOfficer = req.user.id;
-            }
+            // Officers only see issues assigned directly to them
+            query.assignedOfficer = req.user.id;
         }
 
         // Admin sees all issues (no additional filter)
