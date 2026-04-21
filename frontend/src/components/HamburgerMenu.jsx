@@ -79,73 +79,76 @@ function HamburgerMenu() {
             <button
                 aria-label="Open menu"
                 onClick={() => setOpen(!open)}
-                className="p-2 rounded bg-purple-50/10 hover:bg-purple-50/20 text-white mr-3"
+                className="p-2 rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-800 mr-3 transition-colors"
             >
                 ☰
             </button>
 
             {open && (
-                <div ref={menuRef} className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 shadow-lg bg-purple-900 ${isMobile ? 'w-3/4 max-w-xs' : 'w-64 lg:w-80'} `}>
-                    <div className="p-4 border-b">
-                        <div className="font-bold text-white text-[25px]">{profile ? profile.name : ''} - Menu </div>
+                <div ref={menuRef} className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 shadow-2xl bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 ${isMobile ? 'w-3/4 max-w-xs' : 'w-64 lg:w-80'}`}>
+                    {/* Header */}
+                    <div className="p-6 bg-gradient-to-r from-blue-600 to-blue-700 border-b-2 border-blue-500">
+                        <div className="font-bold text-white text-lg">
+                            👋 {profile?.name || 'Menu'}
+                        </div>
                     </div>
 
-                    <ul className="p-2 bg-purple-900 text-white space-y-4">
+                    {/* Menu Items */}
+                    <ul className="p-4 text-white space-y-2">
                         <li>
                             <button
                                 onClick={() => { navigate('/my-issues'); setOpen(false); }}
-                                className="w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors"
+                                className="w-full text-left px-4 py-3 hover:bg-blue-600 rounded-lg transition-colors border-l-4 border-transparent hover:border-blue-400"
                             >
-                                View All Reports
+                                📋 View All Reports
                             </button>
                         </li>
-                        <hr className="border-white-500"></hr>
+
                         <li>
                             <button
                                 onClick={() => { setShowReportModal(true); setOpen(false); }}
-                                className="w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors"
+                                className="w-full text-left px-4 py-3 hover:bg-emerald-600 rounded-lg transition-colors border-l-4 border-transparent hover:border-emerald-400"
                             >
-                                New Report
+                                📝 New Report
                             </button>
                         </li>
-                        <hr className="border-white-500"></hr>
+
                         <li>
                             <button
                                 onClick={() => { setShowSettings(true); setOpen(false); }}
-                                className="w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors"
+                                className="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg transition-colors border-l-4 border-transparent hover:border-slate-400"
                             >
-                                Settings
+                                ⚙️ Settings
                             </button>
                         </li>
-                        <hr className="border-white-500"></hr>
+
                         <li>
                             <button
                                 onClick={() => { setShowNotifications(true); setOpen(false); }}
-                                className="relative w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors"
+                                className="relative w-full text-left px-4 py-3 hover:bg-amber-600 rounded-lg transition-colors border-l-4 border-transparent hover:border-amber-400"
                             >
-                                Notifications
+                                🔔 Notifications
                                 {unreadCount > 0 && (
-                                    <span className="absolute top-1 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                                    <span className="absolute top-2 right-3 inline-flex items-center justify-center px-2 py-1 text-xs font-bold text-white bg-red-500 rounded-full">
                                         {unreadCount}
                                     </span>
                                 )}
                             </button>
                         </li>
-                        <hr className="border-white-500"></hr>
+
                         <li>
                             <button
                                 onClick={() => { setShowLeaderboard(true); setOpen(false); }}
-                                className="relative w-full text-left px-3 py-2 hover:bg-purple-700 rounded transition-colors flex justify-between items-center"
+                                className="w-full text-left px-4 py-3 hover:bg-purple-600 rounded-lg transition-colors border-l-4 border-transparent hover:border-purple-400 flex justify-between items-center"
                             >
-                                <span>Leaderboard</span>
-                                🏆
+                                <span>🏆 Leaderboard</span>
                             </button>
                         </li>
-                        <hr className="border-white-500"></hr>
-                        <li>
-                            <div className="px-3 py-2 text-sm">
-                                <div className="font-semibold">Civic Points</div>
-                                <div className="text-purple-700">{profile ? profile.coins : '0'}</div>
+
+                        <li className="pt-4">
+                            <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-lg">
+                                <div className="font-semibold text-white text-sm">🎯 Civic Points</div>
+                                <div className="text-2xl font-bold text-white">{profile?.coins || '0'}</div>
                             </div>
                         </li>
                     </ul>
@@ -154,11 +157,11 @@ function HamburgerMenu() {
 
             {/* Report Modal */}
             {showReportModal && (
-                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-                    <div className="bg-purple-50 rounded-lg max-w-2xl w-full p-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <h3 className="text-xl font-semibold text-purple-700">Report a Civic Issue</h3>
-                            <button onClick={() => setShowReportModal(false)} className="text-xl">✕</button>
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl">
+                        <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-200">
+                            <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">📝 Report a Civic Issue</h3>
+                            <button onClick={() => setShowReportModal(false)} className="text-2xl text-slate-500 hover:text-slate-700 transition">✕</button>
                         </div>
                         <ReportIssueForm
                             embedded

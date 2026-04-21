@@ -7,7 +7,7 @@ import { useAuth } from "../context/AuthContext";
 const STATUS_CONFIG = {
     Pending: { color: "bg-red-100 text-red-700 border-red-200", dot: "bg-red-500" },
     "In Progress": { color: "bg-amber-100 text-amber-700 border-amber-200", dot: "bg-amber-500" },
-    Resolved: { color: "bg-green-100 text-green-700 border-green-200", dot: "bg-green-500" },
+    Resolved: { color: "bg-emerald-100 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
 };
 
 /* ── tiny toast ──────────────────────────────────────────────── */
@@ -17,7 +17,7 @@ function Toast({ msg, type, onClose }) {
         return () => clearTimeout(t);
     }, [onClose]);
     return (
-        <div className={`fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl shadow-xl text-white text-sm font-semibold flex items-center gap-2 ${type === "success" ? "bg-green-600" : "bg-red-600"
+        <div className={`fixed bottom-6 right-6 z-50 px-6 py-4 rounded-xl shadow-xl text-white text-sm font-semibold flex items-center gap-3 ${type === "success" ? "bg-emerald-600" : "bg-red-600"
             }`} style={{ animation: "slideUp 0.3s ease" }}>
             {type === "success" ? "✅" : "❌"} {msg}
             <button onClick={onClose} className="ml-2 opacity-70 hover:opacity-100 text-lg">×</button>
@@ -45,7 +45,7 @@ function LocationBadge({ location }) {
 
     return (
         <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-400">📍</span>
+            <span className="text-slate-400">📍</span>
             {mapsUrl ? (
                 <a
                     href={mapsUrl}
@@ -55,11 +55,11 @@ function LocationBadge({ location }) {
                 >
                     {address || label}
                     {hasCoords && address && (
-                        <span className="ml-1 text-xs text-gray-400 font-normal">({label})</span>
+                        <span className="ml-1 text-xs text-slate-400 font-normal">({label})</span>
                     )}
                 </a>
             ) : (
-                <span className="text-gray-600">{label}</span>
+                <span className="text-slate-600">{label}</span>
             )}
         </div>
     );
@@ -127,40 +127,41 @@ function OfficerDashboard() {
 
     /* ══ render ══════════════════════════════════════════════ */
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-indigo-700 to-blue-700 text-white px-8 py-6 shadow-lg">
-                <h1 className="text-3xl font-bold">👮 Officer Dashboard</h1>
-                <p className="text-blue-200 text-sm mt-1">
-                    {user?.department} Department · {user?.name}
+            <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 text-white px-8 py-8 shadow-lg">
+                <h1 className="text-4xl font-bold mb-2">👮 Officer Dashboard</h1>
+                <p className="text-blue-200 text-lg">
+                    {user?.department} Department • {user?.name}
                 </p>
             </div>
 
-            {/* Stat strip */}
-            <div className="bg-white border-b border-gray-200 px-8 py-4 flex flex-wrap gap-6">
-                {[
-                    { label: "Total Assigned", val: counts.all, color: "text-blue-600" },
-                    { label: "Pending", val: counts.Pending, color: "text-red-600" },
-                    { label: "In Progress", val: counts["In Progress"], color: "text-amber-600" },
-                    { label: "Resolved", val: counts.Resolved, color: "text-green-600" },
-                ].map((s) => (
-                    <div key={s.label} className="text-center">
-                        <p className={`text-2xl font-extrabold ${s.color}`}>{s.val}</p>
-                        <p className="text-xs text-gray-500 font-medium">{s.label}</p>
-                    </div>
-                ))}
-            </div>
+            {/* Stat Cards */}
+            <div className="px-8 py-8 max-w-7xl mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    {[
+                        { label: "Total Assigned", val: counts.all, color: "from-blue-500 to-blue-600", icon: "📊" },
+                        { label: "Pending", val: counts.Pending, color: "from-red-500 to-red-600", icon: "⏳" },
+                        { label: "In Progress", val: counts["In Progress"], color: "from-amber-500 to-amber-600", icon: "🔄" },
+                        { label: "Resolved", val: counts.Resolved, color: "from-emerald-500 to-emerald-600", icon: "✅" },
+                    ].map((s) => (
+                        <div key={s.label} className={`bg-gradient-to-br ${s.color} text-white rounded-xl shadow-lg p-6`}>
+                            <div className="text-3xl mb-2">{s.icon}</div>
+                            <p className="text-sm opacity-90 font-medium">{s.label}</p>
+                            <p className="text-4xl font-bold mt-2">{s.val}</p>
+                        </div>
+                    ))}
+                </div>
 
-            <div className="px-8 py-6 max-w-7xl mx-auto">
                 {/* Filter tabs */}
-                <div className="flex flex-wrap gap-2 mb-6">
+                <div className="flex flex-wrap gap-2 mb-8">
                     {["all", "Pending", "In Progress", "Resolved"].map((f) => (
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${filter === f
-                                    ? "bg-blue-600 text-white shadow"
-                                    : "bg-white text-gray-600 border border-gray-200 hover:border-blue-400"
+                            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${filter === f
+                                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg"
+                                    : "bg-white text-slate-600 border-2 border-slate-200 hover:border-blue-400 hover:text-blue-600"
                                 }`}
                         >
                             {f === "all" ? `All (${counts.all})` : `${f} (${counts[f]})`}
@@ -170,13 +171,13 @@ function OfficerDashboard() {
 
                 {/* Loading skeleton */}
                 {fetching && (
-                    <div className="grid md:grid-cols-2 gap-5">
+                    <div className="grid md:grid-cols-2 gap-6">
                         {[1, 2, 3, 4].map((n) => (
-                            <div key={n} className="bg-white rounded-2xl shadow p-5 animate-pulse">
-                                <div className="h-4 bg-gray-200 rounded w-3/4 mb-3" />
-                                <div className="h-3 bg-gray-100 rounded w-full mb-2" />
-                                <div className="h-32 bg-gray-100 rounded-xl mb-3" />
-                                <div className="h-3 bg-gray-100 rounded w-1/2" />
+                            <div key={n} className="bg-white rounded-xl shadow-sm p-6 animate-pulse">
+                                <div className="h-5 bg-slate-200 rounded w-3/4 mb-4" />
+                                <div className="h-3 bg-slate-100 rounded w-full mb-3" />
+                                <div className="h-40 bg-slate-100 rounded-lg mb-4" />
+                                <div className="h-3 bg-slate-100 rounded w-1/2" />
                             </div>
                         ))}
                     </div>
@@ -184,54 +185,54 @@ function OfficerDashboard() {
 
                 {/* Empty state */}
                 {!fetching && filteredIssues.length === 0 && (
-                    <div className="bg-white rounded-2xl shadow py-20 text-center">
-                        <p className="text-5xl mb-3">📋</p>
-                        <p className="text-lg font-semibold text-gray-700">No issues found</p>
-                        <p className="text-sm text-gray-400 mt-1">
+                    <div className="bg-white rounded-xl shadow-sm py-20 text-center border-2 border-dashed border-slate-200">
+                        <p className="text-6xl mb-4">📋</p>
+                        <p className="text-xl font-bold text-slate-900">No issues found</p>
+                        <p className="text-slate-500 mt-2">
                             {filter === "all"
                                 ? "No issues assigned to your department yet."
-                                : `No ${filter} issues right now.`}
+                                : `No ${filter.toLowerCase()} issues right now.`}
                         </p>
                     </div>
                 )}
 
                 {/* Issue cards */}
                 {!fetching && filteredIssues.length > 0 && (
-                    <div className="grid md:grid-cols-2 gap-5">
+                    <div className="grid md:grid-cols-2 gap-6">
                         {filteredIssues.map((issue) => {
                             const cfg = STATUS_CONFIG[issue.status] || STATUS_CONFIG.Pending;
                             return (
                                 <div
                                     key={issue._id}
-                                    className="bg-white rounded-2xl shadow p-5 flex flex-col gap-4 border border-gray-100 hover:shadow-md transition-shadow"
+                                    className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-slate-200 flex flex-col gap-4 p-6"
                                 >
                                     {/* Top: title + status badge */}
                                     <div className="flex items-start justify-between gap-3">
-                                        <h4 className="text-base font-bold text-gray-800 leading-snug">
+                                        <h4 className="text-lg font-bold text-slate-900 leading-snug flex-1">
                                             {issue.title}
                                         </h4>
-                                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border whitespace-nowrap shrink-0 ${cfg.color}`}>
-                                            <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border whitespace-nowrap shrink-0 ${cfg.color}`}>
+                                            <span className={`w-2 h-2 rounded-full ${cfg.dot}`} />
                                             {issue.status}
                                         </span>
                                     </div>
 
                                     {/* Description */}
-                                    <p className="text-sm text-gray-600 leading-relaxed">{issue.description}</p>
+                                    <p className="text-slate-600 leading-relaxed line-clamp-3">{issue.description}</p>
 
                                     {/* ── Photo ── */}
                                     {issue.imageURL && (
                                         <div
-                                            className="cursor-zoom-in"
+                                            className="cursor-pointer group"
                                             onClick={() => setExpandedImage(issue.imageURL)}
                                             title="Click to enlarge"
                                         >
                                             <img
                                                 src={issue.imageURL}
                                                 alt="Issue photo"
-                                                className="w-full h-48 object-cover rounded-xl border border-gray-200 hover:opacity-90 transition-opacity"
+                                                className="w-full h-48 object-cover rounded-lg border border-slate-200 group-hover:opacity-90 transition-opacity"
                                             />
-                                            <p className="text-xs text-gray-400 mt-1 text-right">🔍 Click to enlarge</p>
+                                            <p className="text-xs text-slate-500 mt-2 text-center">🔍 Click to enlarge</p>
                                         </div>
                                     )}
 
@@ -239,33 +240,32 @@ function OfficerDashboard() {
                                     <LocationBadge location={issue.location} />
 
                                     {/* Meta info */}
-                                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                                    <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-500 pt-2 border-t border-slate-100">
                                         <span>📂 {issue.category}</span>
                                         <span>🏢 {issue.department}</span>
                                         {issue.createdBy?.name && (
                                             <span>👤 {issue.createdBy.name}</span>
                                         )}
-                                        <span>🗓️ {new Date(issue.createdAt).toLocaleDateString("en-IN", {
+                                        <span>📅 {new Date(issue.createdAt).toLocaleDateString("en-IN", {
                                             day: "numeric", month: "short", year: "numeric"
                                         })}</span>
                                     </div>
 
                                     {/* ── Past comments ── */}
                                     {issue.comments && issue.comments.length > 0 && (
-                                        <div className="bg-gray-50 rounded-xl p-3 space-y-2">
-                                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                                                Progress Notes
+                                        <div className="bg-slate-50 rounded-lg p-4 space-y-3 border border-slate-200">
+                                            <p className="text-xs font-bold text-slate-600 uppercase tracking-wide">
+                                                📝 Progress Notes
                                             </p>
                                             {issue.comments.map((c, i) => (
-                                                <div key={i} className="text-xs text-gray-600 border-l-2 border-blue-300 pl-2">
-                                                    <span className="font-medium text-blue-700">
+                                                <div key={i} className="text-xs text-slate-600 border-l-3 border-blue-400 pl-3">
+                                                    <span className="font-semibold text-blue-600">
                                                         {c.by?.name || "Officer"}
                                                     </span>
-                                                    {" · "}
-                                                    {new Date(c.at).toLocaleString("en-IN", {
+                                                    <span className="text-slate-400"> · {new Date(c.at).toLocaleString("en-IN", {
                                                         day: "numeric", month: "short", hour: "2-digit", minute: "2-digit"
-                                                    })}
-                                                    <p className="mt-0.5">{c.text}</p>
+                                                    })}</span>
+                                                    <p className="mt-1">{c.text}</p>
                                                 </div>
                                             ))}
                                         </div>
@@ -273,17 +273,17 @@ function OfficerDashboard() {
 
                                     {/* Comment input */}
                                     <textarea
-                                        placeholder="Add a progress note (optional)..."
+                                        placeholder="Add a progress note (optional)…"
                                         value={comment[issue._id] || ""}
                                         onChange={(e) =>
                                             setComment({ ...comment, [issue._id]: e.target.value })
                                         }
                                         rows={2}
-                                        className="w-full border border-gray-200 bg-gray-50 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 resize-none"
+                                        className="w-full border-2 border-slate-200 bg-slate-50 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
                                     />
 
                                     {/* Action buttons */}
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-3 pt-2">
                                         <ActionBtn
                                             label="⏳ In Progress"
                                             disabled={issue.status === "In Progress"}
@@ -295,7 +295,7 @@ function OfficerDashboard() {
                                             label="✅ Resolve"
                                             disabled={issue.status === "Resolved"}
                                             loading={actionLoading === `${issue._id}-Resolved`}
-                                            color="green"
+                                            color="emerald"
                                             onClick={() => handleStatusChange(issue._id, "Resolved")}
                                         />
                                     </div>
@@ -303,7 +303,7 @@ function OfficerDashboard() {
                                     {/* Chat with citizen */}
                                     <button
                                         onClick={() => navigate(`/chat/${issue._id}`)}
-                                        className="w-full mt-1 py-2 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs font-bold hover:from-violet-700 hover:to-purple-700 transition flex items-center justify-center gap-1.5 shadow-sm"
+                                        className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-bold hover:from-blue-700 hover:to-cyan-700 transition flex items-center justify-center gap-2 shadow-sm"
                                     >
                                         💬 Chat with Citizen
                                     </button>
@@ -353,16 +353,16 @@ function OfficerDashboard() {
 function ActionBtn({ label, disabled, loading, color, onClick }) {
     const colors = {
         amber: "bg-amber-500 hover:bg-amber-600 disabled:bg-amber-200",
-        green: "bg-green-600 hover:bg-green-700 disabled:bg-green-200",
+        emerald: "bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-200",
     };
     return (
         <button
             onClick={onClick}
             disabled={disabled || loading}
-            className={`flex-1 py-2 rounded-xl text-white text-xs font-bold transition-colors flex items-center justify-center gap-1 ${colors[color]}`}
+            className={`flex-1 py-2 rounded-lg text-white text-sm font-bold transition-colors flex items-center justify-center gap-2 ${colors[color]}`}
         >
             {loading ? (
-                <svg className="animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                 </svg>

@@ -26,10 +26,10 @@ function FeedbackForm({ issue, onSubmitted }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} className="mt-5 border-t border-purple-200 pt-5">
-            <h4 className="text-base font-bold text-purple-800 mb-3">⭐ Rate this Resolution</h4>
+        <form onSubmit={handleSubmit} className="mt-5 border-t border-slate-200 pt-5">
+            <h4 className="text-base font-bold text-slate-900 mb-4">⭐ Rate This Resolution</h4>
             {/* Star Row */}
-            <div className="flex gap-1 mb-3">
+            <div className="flex gap-2 mb-4">
                 {[1, 2, 3, 4, 5].map((star) => (
                     <button
                         key={star}
@@ -37,15 +37,15 @@ function FeedbackForm({ issue, onSubmitted }) {
                         onClick={() => setRating(star)}
                         onMouseEnter={() => setHovered(star)}
                         onMouseLeave={() => setHovered(0)}
-                        className={`text-3xl transition-transform hover:scale-110 ${
-                            star <= (hovered || rating) ? "text-yellow-400" : "text-gray-300"
+                        className={`text-4xl transition-transform hover:scale-125 ${
+                            star <= (hovered || rating) ? "text-amber-400" : "text-slate-300"
                         }`}
                     >
                         ★
                     </button>
                 ))}
                 {rating > 0 && (
-                    <span className="ml-2 text-sm text-gray-500 self-center">
+                    <span className="ml-2 text-sm text-slate-600 self-center font-medium">
                         {["Poor", "Fair", "Good", "Very Good", "Excellent"][rating - 1]}
                     </span>
                 )}
@@ -56,13 +56,13 @@ function FeedbackForm({ issue, onSubmitted }) {
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Share your experience (optional)…"
                 rows={3}
-                className="w-full border border-purple-200 bg-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-400 resize-none mb-2"
+                className="w-full border-2 border-slate-200 bg-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none mb-4"
             />
             {error && <p className="text-red-500 text-xs mb-2">{error}</p>}
             <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-2 bg-purple-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50"
             >
                 {submitting ? "Submitting…" : "Submit Feedback"}
             </button>
@@ -100,227 +100,237 @@ function AllMyIssues() {
         : issues.filter(issue => issue.status === filter);
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-slate-50">
             {/* Header */}
-            <div className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-bold text-gray-800">Your Reported Issues</h2>
+            <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-6 py-12">
+                <div className="max-w-6xl mx-auto flex items-center justify-between">
+                    <div>
+                        <h1 className="text-4xl font-bold mb-2">All Your Issues</h1>
+                        <p className="text-blue-100">Track and manage all issues you've reported</p>
+                    </div>
                     <button
                         onClick={() => navigate("/citizen")}
-                        className="text-purple-700 hover:text-purple-900 font-semibold"
+                        className="bg-white text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-lg font-semibold transition"
                     >
                         ← Back to Dashboard
                     </button>
                 </div>
-                <p className="text-gray-600">Total Issues: {issues.length}</p>
             </div>
 
-            {/* Filter Buttons */}
-            <div className="mb-6 flex gap-3 flex-wrap">
-                <button
-                    onClick={() => setFilter("all")}
-                    className={`px-4 py-2 rounded-lg font-semibold transition ${
-                        filter === "all"
-                            ? "bg-purple-700 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                >
-                    All ({issues.length})
-                </button>
-                <button
-                    onClick={() => setFilter("Pending")}
-                    className={`px-4 py-2 rounded-lg font-semibold transition ${
-                        filter === "Pending"
-                            ? "bg-red-600 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                >
-                    Pending ({issues.filter(i => i.status === "Pending").length})
-                </button>
-                <button
-                    onClick={() => setFilter("In Progress")}
-                    className={`px-4 py-2 rounded-lg font-semibold transition ${
-                        filter === "In Progress"
-                            ? "bg-yellow-600 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                >
-                    In Progress ({issues.filter(i => i.status === "In Progress").length})
-                </button>
-                <button
-                    onClick={() => setFilter("Resolved")}
-                    className={`px-4 py-2 rounded-lg font-semibold transition ${
-                        filter === "Resolved"
-                            ? "bg-green-600 text-white"
-                            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-                    }`}
-                >
-                    Resolved ({issues.filter(i => i.status === "Resolved").length})
-                </button>
-            </div>
-
-            {/* Loading State */}
-            {loading ? (
-                <div className="text-center py-12">
-                    <p className="text-gray-600 text-lg">Loading issues...</p>
+            <div className="max-w-6xl mx-auto px-6 py-12">
+                {/* Filter Buttons */}
+                <div className="mb-8 flex gap-3 flex-wrap">
+                    <button
+                        onClick={() => setFilter("all")}
+                        className={`px-4 py-2 rounded-lg font-semibold transition ${
+                            filter === "all"
+                                ? "bg-blue-600 text-white"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-blue-400"
+                        }`}
+                    >
+                        All ({issues.length})
+                    </button>
+                    <button
+                        onClick={() => setFilter("Pending")}
+                        className={`px-4 py-2 rounded-lg font-semibold transition ${
+                            filter === "Pending"
+                                ? "bg-red-600 text-white"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-red-400"
+                        }`}
+                    >
+                        Pending ({issues.filter(i => i.status === "Pending").length})
+                    </button>
+                    <button
+                        onClick={() => setFilter("In Progress")}
+                        className={`px-4 py-2 rounded-lg font-semibold transition ${
+                            filter === "In Progress"
+                                ? "bg-amber-600 text-white"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-amber-400"
+                        }`}
+                    >
+                        In Progress ({issues.filter(i => i.status === "In Progress").length})
+                    </button>
+                    <button
+                        onClick={() => setFilter("Resolved")}
+                        className={`px-4 py-2 rounded-lg font-semibold transition ${
+                            filter === "Resolved"
+                                ? "bg-emerald-600 text-white"
+                                : "bg-white text-slate-700 border-2 border-slate-200 hover:border-emerald-400"
+                        }`}
+                    >
+                        Resolved ({issues.filter(i => i.status === "Resolved").length})
+                    </button>
                 </div>
-            ) : filteredIssues.length === 0 ? (
-                <div className="bg-gray-100 rounded-lg p-12 text-center">
-                    <p className="text-gray-600 text-lg">
-                        {filter === "all"
-                            ? "No issues reported yet."
-                            : `No ${filter.toLowerCase()} issues.`}
-                    </p>
-                </div>
-            ) : (
-                <div className="space-y-4">
-                    {filteredIssues.map((issue) => (
-                        <div
-                            key={issue._id}
-                            onClick={() => setSelectedIssue(issue)}
-                            className="bg-purple-50 rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden cursor-pointer"
-                        >
-                            <div className="flex flex-col md:flex-row">
-                                {/* Image */}
-                                {issue.imageURL && (
-                                    <div className="md:w-48 h-48 md:h-auto bg-gray-200 flex-shrink-0">
-                                        <img
-                                            src={issue.imageURL}
-                                            alt={issue.title}
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                )}
 
-                                {/* Content */}
-                                <div className="flex-1 p-6 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex items-start justify-between mb-3">
-                                            <h3 className="text-xl font-bold text-purple-800 flex-1">{issue.title}</h3>
-                                            <span
-                                                className={`text-xs font-semibold px-3 py-1 rounded whitespace-nowrap ml-2 ${
-                                                    issue.status === "Resolved"
-                                                        ? "bg-green-100 text-green-800"
-                                                        : issue.status === "In Progress"
-                                                            ? "bg-yellow-100 text-yellow-800"
-                                                            : "bg-red-100 text-red-800"
-                                                }`}
-                                            >
-                                                {issue.status}
-                                            </span>
+                {/* Loading State */}
+                {loading ? (
+                    <div className="text-center py-16">
+                        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full mx-auto animate-spin mb-4"></div>
+                        <p className="text-slate-600 text-lg">Loading issues...</p>
+                    </div>
+                ) : filteredIssues.length === 0 ? (
+                    <div className="bg-white rounded-xl shadow-sm p-12 text-center border-2 border-dashed border-slate-200">
+                        <p className="text-slate-600 text-lg font-medium">
+                            {filter === "all"
+                                ? "No issues reported yet."
+                                : `No ${filter.toLowerCase()} issues.`}
+                        </p>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        {filteredIssues.map((issue) => (
+                            <div
+                                key={issue._id}
+                                onClick={() => setSelectedIssue(issue)}
+                                className="bg-white rounded-xl shadow-sm hover:shadow-md transition duration-200 overflow-hidden cursor-pointer border border-slate-200"
+                            >
+                                <div className="flex flex-col md:flex-row">
+                                    {/* Image */}
+                                    {issue.imageURL && (
+                                        <div className="md:w-52 h-48 md:h-auto bg-slate-200 flex-shrink-0">
+                                            <img
+                                                src={issue.imageURL}
+                                                alt={issue.title}
+                                                className="w-full h-full object-cover hover:opacity-90 transition"
+                                            />
                                         </div>
-                                        <p className="text-gray-700 mb-4">{issue.description}</p>
-                                    </div>
+                                    )}
 
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-gray-600">
+                                    {/* Content */}
+                                    <div className="flex-1 p-6 flex flex-col justify-between">
                                         <div>
-                                            <p className="font-semibold text-gray-800">Category</p>
-                                            <p className="text-purple-700">{issue.category}</p>
+                                            <div className="flex items-start justify-between mb-3 gap-2">
+                                                <h3 className="text-xl font-bold text-slate-900 flex-1">{issue.title}</h3>
+                                                <span
+                                                    className={`text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap ${
+                                                        issue.status === "Resolved"
+                                                            ? "bg-emerald-100 text-emerald-700"
+                                                            : issue.status === "In Progress"
+                                                                ? "bg-amber-100 text-amber-700"
+                                                                : "bg-red-100 text-red-700"
+                                                    }`}
+                                                >
+                                                    {issue.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-slate-600 mb-4">{issue.description}</p>
                                         </div>
-                                        {issue.location?.address && (
+
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-600 pb-4 border-t border-slate-100 pt-4">
                                             <div>
-                                                <p className="font-semibold text-gray-800">Location</p>
-                                                <p className="text-gray-700">{issue.location.address}</p>
+                                                <p className="font-semibold text-slate-900">Category</p>
+                                                <p className="text-blue-600 font-medium">{issue.category}</p>
                                             </div>
-                                        )}
-                                        {issue.createdAt && (
-                                            <div>
-                                                <p className="font-semibold text-gray-800">Reported On</p>
-                                                <p className="text-gray-700">
-                                                    {new Date(issue.createdAt).toLocaleDateString()}
-                                                </p>
-                                            </div>
-                                        )}
-                                        <div>
-                                            <p className="font-semibold text-gray-800">Assigned Officer</p>
-                                            {issue.assignedOfficer?.name ? (
-                                                <p className="text-purple-700 font-medium flex items-center gap-1">
-                                                    <span>👤</span> {issue.assignedOfficer.name}
-                                                </p>
-                                            ) : (
-                                                <p className="text-gray-400 italic">Unassigned</p>
+                                            {issue.location?.address && (
+                                                <div>
+                                                    <p className="font-semibold text-slate-900">Location</p>
+                                                    <p className="text-slate-700 truncate">{issue.location.address}</p>
+                                                </div>
                                             )}
+                                            {issue.createdAt && (
+                                                <div>
+                                                    <p className="font-semibold text-slate-900">Reported On</p>
+                                                    <p className="text-slate-700">
+                                                        {new Date(issue.createdAt).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                            )}
+                                            <div>
+                                                <p className="font-semibold text-slate-900">Officer</p>
+                                                {issue.assignedOfficer?.name ? (
+                                                    <p className="text-blue-600 font-medium flex items-center gap-1">
+                                                        👤 {issue.assignedOfficer.name}
+                                                    </p>
+                                                ) : (
+                                                    <p className="text-slate-400 italic">Unassigned</p>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Chat button */}
-                                    {issue.assignedOfficer?._id && (
-                                        <div className="mt-3 pt-3 border-t border-purple-100">
+                                        {/* Chat button */}
+                                        {issue.assignedOfficer?._id && (
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); navigate(`/chat/${issue._id}`); }}
-                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-sm font-semibold rounded-xl hover:from-violet-700 hover:to-purple-700 transition shadow-sm"
+                                                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-cyan-700 transition shadow-sm w-fit"
                                             >
                                                 💬 Chat with Officer
                                             </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
 
                 {/* Issue Detail Modal */}
                 {selectedIssue && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-                        <div className="bg-purple-50 rounded-lg max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-xl font-bold text-purple-800">{selectedIssue.title}</h3>
-                                <button onClick={() => setSelectedIssue(null)} className="text-xl">✕</button>
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                        <div className="bg-white rounded-2xl max-w-xl w-full p-6 overflow-y-auto max-h-[90vh] shadow-2xl">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-2xl font-bold text-slate-900">{selectedIssue.title}</h3>
+                                <button onClick={() => setSelectedIssue(null)} className="text-2xl text-slate-400 hover:text-slate-600">✕</button>
                             </div>
 
                             {selectedIssue.imageURL && (
-                                <div className="mb-4">
-                                    <img src={selectedIssue.imageURL} alt={selectedIssue.title} className="w-full h-64 object-cover rounded" />
+                                <div className="mb-6 rounded-xl overflow-hidden">
+                                    <img src={selectedIssue.imageURL} alt={selectedIssue.title} className="w-full h-64 object-cover" />
                                 </div>
                             )}
 
-                            <div className="mb-3 text-gray-700">{selectedIssue.description}</div>
+                            <div className="mb-6 text-slate-700 leading-relaxed">{selectedIssue.description}</div>
 
-                            <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-2 gap-4 text-sm mb-6 pb-6 border-b border-slate-200">
                                 <div>
-                                    <p className="font-semibold">Status</p>
-                                    <p>{selectedIssue.status}</p>
+                                    <p className="font-semibold text-slate-900">Status</p>
+                                    <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                                        selectedIssue.status === "Resolved"
+                                            ? "bg-emerald-100 text-emerald-700"
+                                            : selectedIssue.status === "In Progress"
+                                                ? "bg-amber-100 text-amber-700"
+                                                : "bg-red-100 text-red-700"
+                                    }`}>
+                                        {selectedIssue.status}
+                                    </span>
                                 </div>
                                 <div>
-                                    <p className="font-semibold">Reported On</p>
+                                    <p className="font-semibold text-slate-900">Reported On</p>
                                     <p>{new Date(selectedIssue.createdAt).toLocaleString()}</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold">Accepted On</p>
+                                    <p className="font-semibold text-slate-900">Accepted On</p>
                                     <p>{selectedIssue.acceptedAt ? new Date(selectedIssue.acceptedAt).toLocaleString() : '—'}</p>
                                 </div>
                                 <div>
-                                    <p className="font-semibold">Resolved On</p>
+                                    <p className="font-semibold text-slate-900">Resolved On</p>
                                     <p>{selectedIssue.resolvedAt ? new Date(selectedIssue.resolvedAt).toLocaleString() : '—'}</p>
                                 </div>
                             </div>
 
-                            <div className="mt-4 text-sm text-gray-600">
-                                <p className="font-semibold mb-2">Tracking & Details</p>
-                                <ul className="list-disc pl-5 space-y-1">
-                                    <li>Category: {selectedIssue.category}</li>
-                                    <li>Department: {selectedIssue.department || '—'}</li>
-                                    <li>Location: {selectedIssue.location?.address || '—'}</li>
-                                    <li>Assigned Officer: {selectedIssue.assignedOfficer?.name || 'Not assigned'}</li>
+                            <div className="mb-6 text-sm bg-slate-50 rounded-lg p-4">
+                                <p className="font-semibold text-slate-900 mb-3">📋 Tracking Details</p>
+                                <ul className="space-y-2 text-slate-700">
+                                    <li><span className="font-medium">Category:</span> {selectedIssue.category}</li>
+                                    <li><span className="font-medium">Department:</span> {selectedIssue.department || '—'}</li>
+                                    <li><span className="font-medium">Location:</span> {selectedIssue.location?.address || '—'}</li>
+                                    <li><span className="font-medium">Assigned Officer:</span> {selectedIssue.assignedOfficer?.name || 'Not assigned'}</li>
                                 </ul>
                             </div>
 
                             {/* ── Feedback area ── */}
                             {selectedIssue.status === "Resolved" && (
                                 selectedIssue.feedback?.submitted ? (
-                                    <div className="mt-5 border-t border-purple-200 pt-5 bg-green-50 rounded-xl p-4">
-                                        <p className="text-green-700 font-bold text-sm mb-1">✅ Feedback Submitted</p>
-                                        <div className="flex gap-0.5 mb-1">
+                                    <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
+                                        <p className="text-emerald-700 font-bold text-sm mb-3">✅ Feedback Submitted</p>
+                                        <div className="flex gap-0.5 mb-2">
                                             {[1,2,3,4,5].map(s => (
-                                                <span key={s} className={`text-xl ${ s <= selectedIssue.feedback.rating ? "text-yellow-400" : "text-gray-300"}`}>★</span>
+                                                <span key={s} className={`text-xl ${ s <= selectedIssue.feedback.rating ? "text-amber-400" : "text-slate-300"}`}>★</span>
                                             ))}
                                         </div>
                                         {selectedIssue.feedback.comment && (
-                                            <p className="text-gray-600 text-sm italic">"{selectedIssue.feedback.comment}"</p>
+                                            <p className="text-slate-600 text-sm italic">"{selectedIssue.feedback.comment}"</p>
                                         )}
-                                        <p className="text-xs text-gray-400 mt-1">
+                                        <p className="text-xs text-slate-500 mt-2">
                                             Submitted on {new Date(selectedIssue.feedback.submittedAt).toLocaleDateString()}
                                         </p>
                                     </div>
@@ -344,6 +354,7 @@ function AllMyIssues() {
                         </div>
                     </div>
                 )}
+            </div>
         </div>
     );
 }
