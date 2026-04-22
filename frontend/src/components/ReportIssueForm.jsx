@@ -381,100 +381,108 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
         <div
             className={
                 embedded
-                    ? "space-y-4"
-                    : "bg-purple-500 shadow-lg p-5 rounded-xl space-y-4 max-h-[80vh] overflow-y-auto"
+                    ? "space-y-6"
+                    : "bg-slate-50 shadow-lg p-8 rounded-2xl space-y-6 max-h-[80vh] overflow-y-auto border border-slate-200"
             }
         >
-            {/* Logo */}
-            {!embedded && (
-                <div className="flex flex-col items-center mb-4 bg-gray-200 p-4 rounded-lg">
-                    <img
-                        src="/src/assets/favicon.png"
-                        alt="CivicConnect Logo"
-                        className="w-12 h-12 mb-2"
-                    />
+            {msg && (
+                <div
+                    className={`p-4 rounded-lg font-semibold text-sm ${
+                        msg.includes("successfully") || msg.includes("✓")
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-red-100 text-red-700"
+                    }`}
+                >
+                    {msg}
                 </div>
             )}
 
-            {msg && (
-                <p
-                    className={
-                        msg.includes("successfully")
-                            ? "text-green-500"
-                            : "text-red-500"
-                    }
-                >
-                    {msg}
-                </p>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-4 ">
-                <input
-                    name="title"
-                    placeholder="Title"
-                    value={form.title}
-                    onChange={handleChange}
-                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
-                    required
-                />
-                <textarea
-                    name="description"
-                    placeholder="Description"
-                    value={form.description}
-                    onChange={handleChange}
-                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
-                    required
-                />
-                <select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    className="w-full p-2 border-3 border-white rounded bg-gray-200"
-                    required
-                >
-                    <option value="">Select Category</option>
-                    <option value="Roads">Roads</option>
-                    <option value="Water">Water</option>
-                    <option value="Sanitation">Sanitation</option>
-                    <option value="Electricity">Electricity</option>
-                </select>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Title Input */}
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">📝 Issue Title</label>
+                    <input
+                        name="title"
+                        placeholder="Brief title of the issue"
+                        value={form.title}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+                        required
+                    />
+                </div>
+
+                {/* Description Input */}
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">📄 Description</label>
+                    <textarea
+                        name="description"
+                        placeholder="Provide detailed information about the issue"
+                        value={form.description}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition resize-none"
+                        rows="4"
+                        required
+                    />
+                </div>
+
+                {/* Category Selection */}
+                <div>
+                    <label className="block text-sm font-bold text-slate-700 mb-2">🏷️ Category</label>
+                    <select
+                        name="category"
+                        value={form.category}
+                        onChange={handleChange}
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
+                        required
+                    >
+                        <option value="">Select a category</option>
+                        <option value="Roads">🛣️ Roads</option>
+                        <option value="Water">💧 Water</option>
+                        <option value="Sanitation">🧹 Sanitation</option>
+                        <option value="Electricity">⚡ Electricity</option>
+                    </select>
+                </div>
 
                 {/* Location Selection Section */}
-                <div className="border-3 border-white p-4 rounded bg-gray-200">
-                  <center>  <h3 className="font-bold mb-3 ">📍 Location</h3></center>
+                <div className="border-2 border-slate-200 p-6 rounded-lg bg-white">
+                    <h3 className="font-bold text-slate-900 mb-4">📍 Location</h3>
                     
                     {/* Current Selection Display */}
-                    <div className="space-y-2 mb-3">
+                    <div className="mb-4">
                         {form.location.lat && form.location.lng ? (
-                            <p className="text-green-600 font-semibold">
-                                ✓ {form.location.address}
-                            </p>
+                            <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                                <p className="text-emerald-700 font-semibold">✓ {form.location.address}</p>
+                                <p className="text-xs text-emerald-600">{form.location.lat}°, {form.location.lng}°</p>
+                            </div>
                         ) : (
-                            <p className="text-red-500">Location not selected</p>
+                            <div className="bg-red-50 border border-red-200 p-3 rounded-lg">
+                                <p className="text-red-700 font-semibold">❌ Location not selected</p>
+                            </div>
                         )}
                     </div>
 
                     {/* Location Search Input */}
-                    <div className="relative mb-3">
+                    <div className="relative mb-4">
                         <input
                             type="text"
                             placeholder="Search location (e.g., 'Main Street')"
                             value={searchQuery}
                             onChange={(e) => handleLocationSearch(e.target.value)}
-                            className="w-full p-2 border-2 border-[#FF5A5A] rounded focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg focus:outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-100 transition"
                         />
                         
                         {/* Search Results Dropdown */}
                         {showResults && searchResults.length > 0 && (
-                            <div className="absolute top-full left-0 right-0 bg-purple-50 border rounded mt-1 shadow-lg max-h-48 overflow-y-auto z-10">
+                            <div className="absolute top-full left-0 right-0 bg-white border-2 border-slate-200 rounded-lg mt-2 shadow-lg max-h-48 overflow-y-auto z-10">
                                 {searchResults.map((result, index) => (
                                     <button
                                         key={index}
                                         type="button"
                                         onClick={() => handleSelectLocation(result)}
-                                        className="w-full text-left p-2 hover:bg-purple-100 border-b text-sm"
+                                        className="w-full text-left px-4 py-3 hover:bg-violet-50 border-b border-slate-100 last:border-0 transition"
                                     >
-                                        <div className="font-semibold">{result.name}</div>
-                                        <div className="text-gray-600 text-xs">{result.display_name}</div>
+                                        <div className="font-semibold text-slate-900">{result.name}</div>
+                                        <div className="text-slate-500 text-xs">{result.display_name}</div>
                                     </button>
                                 ))}
                             </div>
@@ -485,20 +493,20 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                     <button
                         type="button"
                         onClick={handleCurrentLocation}
-                        className="w-full bg-[#3A8B95] text-white p-2 rounded hover:bg-green-600 mb-2"
+                        className="w-full bg-slate-950 text-white font-bold px-4 py-3 rounded-lg hover:bg-black transition shadow-lg mb-4 flex items-center justify-center gap-2"
                     >
-                     Use Current Location
+                        📡 Use Current Location
                     </button>
 
                     {/* Map Display */}
                     {showMap && form.location.lat && form.location.lng && (
-                        <div className="mt-3">
-                            <p className="text-sm text-gray-600 mb-2">
-                                💡 Drag the marker to move • Click on map to reposition • Use +/- buttons or scroll wheel to zoom
+                        <div className="mt-4">
+                            <p className="text-xs text-slate-600 mb-3 bg-violet-50 p-3 rounded-lg">
+                                💡 <strong>Tip:</strong> Drag the marker to move • Click on map to reposition • Use +/- or scroll to zoom
                             </p>
                             <div
                                 ref={mapRef}
-                                className="w-full h-64 rounded border"
+                                className="w-full h-64 rounded-lg border-2 border-slate-200"
                                 style={{ backgroundColor: "#e5e3df" }}
                             ></div>
                         </div>
@@ -506,49 +514,52 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                 </div>
 
                 {/* Photo Capture Section */}
-                <div className="border p-4 rounded bg-gray-200 border-3 border-white">
-                    <center><h3 className="font-bold mb-3">📷 Photo</h3></center>
+                <div className="border-2 border-slate-200 p-6 rounded-lg bg-white">
+                    <h3 className="font-bold text-slate-900 mb-4">📷 Photo</h3>
                     
                     {/* Image Preview */}
                     {imagePreview ? (
-                        <div className="space-y-2">
-                            <h4 className="font-semibold text-green-600">✓ Photo Ready</h4>
+                        <div className="space-y-4">
+                            <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
+                                <p className="font-semibold text-emerald-700">✓ Photo Ready</p>
+                            </div>
                             <img
                                 src={imagePreview}
                                 alt="Preview"
-                                className="w-full h-48 object-cover rounded border"
+                                className="w-full h-48 object-cover rounded-lg border-2 border-slate-200"
                             />
                             <button
                                 type="button"
                                 onClick={handleClearImage}
-                                className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600"
+                                className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-3 rounded-lg transition"
                             >
                                 🗑️ Change Photo
                             </button>
                         </div>
                     ) : (
-                        <div className="space-y-2">
+                        <div className="space-y-4">
                             {!useCamera ? (
                                 <>
                                     {/* Camera Option */}
                                     <button
                                         type="button"
                                         onClick={() => setUseCamera(true)}
-                                        className="w-full bg-[#3A8B95] text-white p-2 rounded hover:bg-purple-700 mb-2"
+                                        className="w-full bg-slate-100 text-slate-700 font-bold px-4 py-3 rounded-lg hover:bg-slate-200 transition border-2 border-slate-200"
                                     >
-                                         Take Photo with Camera
+                                        📹 Take Photo with Camera
                                     </button>
                                     
                                     {/* File Upload Option */}
-                                    <div className="border-2 border-[#FF5A5A] rounded p-3">
-                                        <label className="block text-center cursor-pointer">
+                                    <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-violet-500 hover:bg-violet-50 transition cursor-pointer">
+                                        <label className="block cursor-pointer">
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={handleFileChange}
                                                 className="hidden"
                                             />
-                                            <span className="text-gray-600 "> Or choose an existing photo</span>
+                                            <p className="text-slate-600 font-medium">📁 Choose an existing photo</p>
+                                            <p className="text-xs text-slate-500 mt-1">or drag & drop</p>
                                         </label>
                                     </div>
                                 </>
@@ -557,22 +568,22 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                                     {/* Webcam Component */}
                                     <Webcam
                                         ref={webcamRef}
-                                        className="w-full rounded border"
+                                        className="w-full rounded-lg border-2 border-slate-200"
                                         screenshotFormat="image/jpeg"
                                         width="100%"
                                     />
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-3">
                                         <button
                                             type="button"
                                             onClick={handleCapturePhoto}
-                                            className="flex-1 bg-green-500 text-white p-2 rounded hover:bg-green-600"
+                                            className="flex-1 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold px-4 py-3 rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition"
                                         >
                                             ✓ Capture Photo
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => setUseCamera(false)}
-                                            className="flex-1 bg-gray-500 text-white p-2 rounded hover:bg-gray-600"
+                                            className="flex-1 bg-slate-400 hover:bg-slate-500 text-white font-semibold px-4 py-3 rounded-lg transition"
                                         >
                                             ✕ Cancel
                                         </button>
@@ -583,24 +594,27 @@ function ReportIssueForm({ onSuccess, embedded = false }) {
                     )}
                 </div>
 
+                {/* Submit Button */}
                 <button
                     type="submit"
-                    className={`w-full p-2 rounded font-semibold transition-colors ${
+                    className={`w-full font-bold py-4 px-6 rounded-lg transition-all shadow-xl ${
                         form.title && form.description && form.category && form.location.lat && form.location.lng && form.image && !loading
-                            ? "bg-purple-600 text-white hover:bg-purple-700 cursor-pointer"
-                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            ? "bg-gradient-to-r from-orange-500 to-amber-600 text-white hover:from-orange-600 hover:to-amber-700 shadow-orange-500/20"
+                            : "bg-slate-200 text-slate-500 cursor-not-allowed shadow-none"
                     }`}
                     disabled={!form.title || !form.description || !form.category || !form.location.lat || !form.location.lng || !form.image || loading}
-                    title={
-                        !form.title ? "Please enter a title"
-                        : !form.description ? "Please enter a description"
-                        : !form.category ? "Please select a category"
-                        : !form.location.lat || !form.location.lng ? "Please select a location"
-                        : !form.image ? "Please upload a photo"
-                        : "Submit your report"
-                    }
                 >
-                    {loading ? "Submitting..." : "Report Issue"}
+                    {loading ? (
+                        <span className="flex items-center justify-center gap-2">
+                            <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                            Reporting...
+                        </span>
+                    ) : (
+                        "🚀 Report Issue"
+                    )}
                 </button>
             </form>
         </div>

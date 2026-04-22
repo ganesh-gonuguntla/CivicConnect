@@ -63,10 +63,12 @@ function NotificationsModal({ onClose, onRefresh }) {
 
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30">
-            <div ref={modalRef} className="bg-purple-50 rounded-lg max-w-lg w-full p-4">
-                <div className="flex justify-between items-center mb-3">
-                    <h3 className="text-lg font-semibold text-purple-700">Notifications</h3>
-                    <button onClick={onClose}>✕</button>
+            <div ref={modalRef} className="bg-white rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-slide-up">
+                <div className="flex justify-between items-center bg-slate-950 px-6 py-4 text-white">
+                    <h3 className="text-lg font-bold flex items-center gap-2">
+                        <span className="text-orange-500">🔔</span> Notifications
+                    </h3>
+                    <button onClick={onClose} className="text-slate-400 hover:text-white transition text-2xl leading-none">✕</button>
                 </div>
 
                 {loading ? (
@@ -75,23 +77,23 @@ function NotificationsModal({ onClose, onRefresh }) {
                     <div className="py-8 text-center text-gray-600">No recent notifications</div>
                 ) : (
                     <>
-                        <div className="flex justify-end mb-2">
+                        <div className="flex justify-end p-4 pb-0">
                             <button
                                 onClick={markAllRead}
-                                className="text-xs text-purple-700 hover:underline"
+                                className="text-xs font-bold text-orange-600 hover:text-orange-700 transition uppercase tracking-wider"
                             >
-                                Mark all read
+                                Mark all as read
                             </button>
                         </div>
-                        <div className="space-y-3 max-h-80 overflow-y-auto">
+                        <div className="space-y-3 max-h-80 overflow-y-auto p-4 pt-4">
                             {notifications.map((n) => (
                                 <div
                                     key={n._id}
                                     onClick={() => !n.read && markSingleRead(n._id)}
-                                    className={`p-3 border rounded cursor-pointer ${n.read ? 'bg-gray-100' : 'bg-purple-50'} hover:bg-gray-50`}
+                                    className={`p-4 border rounded-xl cursor-pointer transition ${n.read ? 'bg-slate-50 border-slate-100' : 'bg-orange-50/30 border-orange-100'} hover:border-orange-300 hover:shadow-sm`}
                                 >
-                                    <div className="text-sm text-gray-700">{n.message}</div>
-                                    <div className="text-xs text-gray-500 mt-1">{new Date(n.createdAt).toLocaleString()}</div>
+                                    <div className={`text-sm ${n.read ? 'text-slate-600' : 'text-slate-900 font-medium'}`}>{n.message}</div>
+                                    <div className="text-[10px] text-slate-400 mt-2 font-medium uppercase tracking-tight">{new Date(n.createdAt).toLocaleString()}</div>
                                 </div>
                             ))}
                         </div>

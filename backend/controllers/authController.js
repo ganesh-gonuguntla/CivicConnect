@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const https = require('https');
 const User = require('../models/User');
+const Department = require('../models/Department');
 
 const fetchGoogleUser = (accessToken) => {
     return new Promise((resolve, reject) => {
@@ -455,6 +456,24 @@ exports.updateOfficerStatus = async (req, res) => {
 
         if (!officer) {
             return res.status(404).json({ msg: 'Officer not found' });
+        }
+
+        // When approving: ensure officer is in their Department's officers list
+        if (status === 'approved' && officer.department) {
+            await Department.findOneAndUpdate(
+                { name: officer.department },
+                { $addToSet: { officers: officer._id } }, // addToSet = no duplicates
+                { upsert: true, new: true }               // create dept doc if missing
+            );
+            console.log(`[Dept Sync] Officer ${officer.name} added to ${officer.department} dept`);
+        }
+
+        // When rejecting: remove officer from Department
+        if (status === 'rejected' && officer.department) {
+            await Department.findOneAndUpdate(
+                { name: officer.department },
+                { $pull: { officers: officer._id } }
+            );
         }
 
         res.json({ msg: `Officer ${status} successfully`, officer });

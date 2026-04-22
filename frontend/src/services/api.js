@@ -44,3 +44,9 @@ export const updateOfficerStatus = (id, status) => API.put(`/auth/officers/${id}
 export const deleteIssue = (id) => API.delete(`/issues/${id}`);
 export const submitFeedback = (id, data) => API.post(`/issues/${id}/feedback`, data);
 
+// Chat endpoints
+export const getChatMessages = (issueId, page = 1) => API.get(`/chat/${issueId}?page=${page}`);
+export const markChatRead = (issueId) => API.post(`/chat/${issueId}/read`);
+export const editChatMessage = (msgId, text) => API.put(`/chat/message/${msgId}`, { text });
+export const uploadChatMedia = (issueId, formData) =>
+    API.post(`/chat/${issueId}/upload`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });

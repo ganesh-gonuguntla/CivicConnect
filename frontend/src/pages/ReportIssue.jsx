@@ -81,9 +81,10 @@ function ReportIssue() {
         <div className="min-h-screen bg-gray-50 py-10 px-4">
             <div className="max-w-lg mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-700 to-indigo-600 px-6 py-5">
-                    <h2 className="text-2xl font-bold text-white">🛠️ Report a Civic Issue</h2>
-                    <p className="text-blue-200 text-sm mt-1">Help us fix your neighbourhood</p>
+                <div className="bg-slate-950 px-6 py-6 border-b border-white/5 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/5 rounded-full blur-2xl -mr-16 -mt-16"></div>
+                    <h2 className="text-2xl font-bold text-white relative z-10">🛠️ Report a Civic Issue</h2>
+                    <p className="text-slate-400 text-sm mt-1 relative z-10">Help us fix your neighbourhood</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -106,7 +107,7 @@ function ReportIssue() {
                             value={form.title}
                             onChange={handleChange}
                             required
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400 text-sm"
                         />
                     </div>
 
@@ -151,7 +152,7 @@ function ReportIssue() {
                             type="button"
                             onClick={detectLocation}
                             disabled={locating}
-                            className="flex items-center gap-2 mb-2 px-4 py-2 text-sm font-semibold bg-blue-50 text-blue-700 border border-blue-200 rounded-xl hover:bg-blue-100 transition-colors"
+                            className="flex items-center gap-2 mb-2 px-4 py-2 text-sm font-bold bg-slate-900 text-white rounded-xl hover:bg-black transition-colors shadow-lg"
                         >
                             {locating ? (
                                 <>
@@ -188,7 +189,7 @@ function ReportIssue() {
                             placeholder="Or type your address / landmark"
                             value={form.address}
                             onChange={handleChange}
-                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
+                            className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-400 text-sm"
                         />
                     </div>
 
@@ -200,7 +201,7 @@ function ReportIssue() {
                             name="image"
                             accept="image/*"
                             onChange={handleChange}
-                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100 cursor-pointer"
                         />
                         {imagePreview && (
                             <img
@@ -215,7 +216,7 @@ function ReportIssue() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white font-bold rounded-xl shadow-xl shadow-orange-500/20 transition-all flex items-center justify-center gap-2"
                     >
                         {loading ? (
                             <>
