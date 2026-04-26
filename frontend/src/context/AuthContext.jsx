@@ -15,6 +15,14 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/login", { email, password });
+            
+            // Check if email needs verification
+            if (res.data.requiresOTPVerification) {
+                alert(res.data.msg);
+                navigate("/register");
+                return false;
+            }
+
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
@@ -25,8 +33,10 @@ export const AuthProvider = ({ children }) => {
             } else {
                 navigate(`/${res.data.user.role}`);
             }
+            return true;
         } catch (err) {
             alert(err.response?.data?.msg || "Login failed");
+            return false;
         } finally {
             setLoading(false);
         }
@@ -53,23 +63,26 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/register", data);
-            if (res.data.user.role === "officer" && res.data.user.status === "pending") {
-                alert("Registration successful. Your account is waiting for admin approval");
-                navigate("/login");
-                return;
+            
+            // Registration successful, user needs to verify OTP
+            if (res.data.requiresOTPVerification) {
+                return true; // Return true to proceed to OTP verification
             }
+
+            // Fallback for old registration flow (shouldn't happen)
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
 
-            // Newly registered officers need admin approval first
             if (res.data.user.role === "officer" && !res.data.user.verified) {
                 navigate("/pending-verification");
             } else {
                 navigate(`/${res.data.user.role}`);
             }
+            return true;
         } catch (err) {
             alert(err.response?.data?.msg || "Registration failed");
+            return false;
         } finally {
             setLoading(false);
         }

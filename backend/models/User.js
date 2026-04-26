@@ -24,7 +24,11 @@ const userSchema = new mongoose.Schema({
         }
     ],
     // Admin must verify officers before they can access the system
-    verified: { type: Boolean, default: false }
+    verified: { type: Boolean, default: false },
+    // Email verification via OTP
+    emailVerified: { type: Boolean, default: false },
+    otp: { type: String, default: null },
+    otpExpiry: { type: Date, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

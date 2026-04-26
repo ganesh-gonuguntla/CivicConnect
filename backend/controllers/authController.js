@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const https = require('https');
 const User = require('../models/User');
 const Department = require('../models/Department');
+const { generateOTP, sendOTPEmail } = require('../config/email');
 
 const fetchGoogleUser = (accessToken) => {
     return new Promise((resolve, reject) => {
@@ -44,7 +45,7 @@ const fetchGoogleUser = (accessToken) => {
 };
 
 /**
- * Register a new user
+ * Register a new user (sends OTP to email)
  * @route POST /api/auth/register
  * @access Public
  */
@@ -89,6 +90,10 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Generate OTP
+        const otp = generateOTP();
+        const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+
         // Prepare user data
         const userData = {
             name,
@@ -97,10 +102,75 @@ exports.register = async (req, res) => {
             role,
             department: role === 'officer' ? department : null,
             status: role === 'officer' ? 'pending' : 'approved',
+            emailVerified: false,
+            otp,
+            otpExpiry,
         };
 
         // Create new user
         const user = new User(userData);
+        await user.save();
+
+        // Send OTP email
+        const emailSent = await sendOTPEmail(user.email, otp, user.name);
+        if (!emailSent) {
+            // Delete the user if email sending fails
+            await User.findByIdAndDelete(user._id);
+            return res.status(500).json({ msg: 'Failed to send OTP email. Please try again.' });
+        }
+
+        // Send response (user created but not verified yet)
+        res.status(201).json({
+            msg: 'Registration successful! Please check your email for OTP.',
+            email: user.email,
+            userId: user._id,
+            requiresOTPVerification: true,
+        });
+    } catch (err) {
+        console.error('Register Error:', err);
+        res.status(500).json({ msg: 'Server error during registration' });
+    }
+};
+
+/**
+ * Verify OTP and complete registration
+ * @route POST /api/auth/verify-otp
+ * @access Public
+ */
+exports.verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        // Validate required fields
+        if (!email || !otp) {
+            return res.status(400).json({ msg: 'Please provide email and OTP' });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ msg: 'User not found' });
+        }
+
+        // Check if already verified
+        if (user.emailVerified) {
+            return res.status(400).json({ msg: 'Email already verified' });
+        }
+
+        // Check OTP
+        if (user.otp !== otp) {
+            return res.status(400).json({ msg: 'Invalid OTP' });
+        }
+
+        // Check OTP expiry
+        if (new Date() > user.otpExpiry) {
+            return res.status(400).json({ msg: 'OTP has expired. Please register again.' });
+        }
+
+        // Mark email as verified
+        user.emailVerified = true;
+        user.otp = null;
+        user.otpExpiry = null;
         await user.save();
 
         // Generate JWT token
@@ -111,7 +181,8 @@ exports.register = async (req, res) => {
         );
 
         // Send response
-        res.status(201).json({
+        res.json({
+            msg: 'Email verified successfully!',
             token,
             user: {
                 id: user._id,
@@ -120,12 +191,57 @@ exports.register = async (req, res) => {
                 role: user.role,
                 status: user.status,
                 department: user.department,
+                emailVerified: user.emailVerified,
                 verified: user.verified,
             },
         });
     } catch (err) {
-        console.error('Register Error:', err);
-        res.status(500).json({ msg: 'Server error during registration' });
+        console.error('Verify OTP Error:', err);
+        res.status(500).json({ msg: 'Server error during OTP verification' });
+    }
+};
+
+/**
+ * Resend OTP to email
+ * @route POST /api/auth/resend-otp
+ * @access Public
+ */
+exports.resendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ msg: 'Please provide email' });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ msg: 'User not found' });
+        }
+
+        if (user.emailVerified) {
+            return res.status(400).json({ msg: 'Email already verified' });
+        }
+
+        // Generate new OTP
+        const otp = generateOTP();
+        const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+
+        // Update user with new OTP
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
+        await user.save();
+
+        // Send OTP email
+        const emailSent = await sendOTPEmail(user.email, otp, user.name);
+        if (!emailSent) {
+            return res.status(500).json({ msg: 'Failed to send OTP email. Please try again.' });
+        }
+
+        res.json({ msg: 'OTP resent successfully. Check your email.' });
+    } catch (err) {
+        console.error('Resend OTP Error:', err);
+        res.status(500).json({ msg: 'Server error while resending OTP' });
     }
 };
 
@@ -153,6 +269,15 @@ exports.login = async (req, res) => {
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({ msg: 'Invalid email or password' });
+        }
+
+        // Check if email is verified
+        if (!user.emailVerified) {
+            return res.status(403).json({ 
+                msg: 'Please verify your email first. Check your inbox for OTP.',
+                requiresOTPVerification: true,
+                email: user.email
+            });
         }
 
         if (user.role === 'officer' && user.status === 'pending') {
