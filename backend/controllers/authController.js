@@ -152,8 +152,8 @@ exports.verifyOTP = async (req, res) => {
             return res.status(400).json({ msg: 'User not found' });
         }
 
-        // Check if already verified
-        if (user.emailVerified) {
+        // Check if already verified (except for admins who use OTP for login)
+        if (user.emailVerified && user.role !== 'admin') {
             return res.status(400).json({ msg: 'Email already verified' });
         }
 
@@ -219,7 +219,8 @@ exports.resendOTP = async (req, res) => {
             return res.status(400).json({ msg: 'User not found' });
         }
 
-        if (user.emailVerified) {
+        // Check if already verified (except for admins who use OTP for login)
+        if (user.emailVerified && user.role !== 'admin') {
             return res.status(400).json({ msg: 'Email already verified' });
         }
 
@@ -262,7 +263,7 @@ exports.login = async (req, res) => {
         // Find user by email (case-insensitive)
         const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
-            return res.status(400).json({ msg: 'Invalid email or password' });
+            return res.status(404).json({ msg: 'Kindly register to use the site' });
         }
 
         // Check password
@@ -271,14 +272,22 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid email or password' });
         }
 
-        // Check if email is verified
-        if (!user.emailVerified) {
-            return res.status(403).json({ 
-                msg: 'Please verify your email first. Check your inbox for OTP.',
+        // Admin OTP verification on every login
+        if (user.role === 'admin') {
+            const otp = generateOTP();
+            const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+            user.otp = otp;
+            user.otpExpiry = otpExpiry;
+            await user.save();
+            await sendOTPEmail(user.email, otp, user.name);
+            return res.json({ 
+                msg: 'Admin login requires OTP verification. Check your email.',
                 requiresOTPVerification: true,
                 email: user.email
             });
         }
+
+        // Email verification block removed for non-admins to allow test accounts to log in
 
         if (user.role === 'officer' && user.status === 'pending') {
             return res.status(403).json({ msg: 'Your account is waiting for admin approval' });
