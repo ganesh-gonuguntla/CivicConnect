@@ -14,6 +14,16 @@ router.post('/google', authController.googleLogin);
 // @access  Public
 router.post('/register', authController.register);
 
+// @route   POST /api/auth/verify-otp
+// @desc    Verify OTP and complete registration
+// @access  Public
+router.post('/verify-otp', authController.verifyOTP);
+
+// @route   POST /api/auth/resend-otp
+// @desc    Resend OTP to email
+// @access  Public
+router.post('/resend-otp', authController.resendOTP);
+
 // @route   POST /api/auth/login
 // @desc    Login user
 // @access  Public

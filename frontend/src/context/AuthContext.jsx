@@ -15,6 +15,12 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/login", { email, password });
+            
+            // Check if email needs verification
+            if (res.data.requiresOTPVerification) {
+                return { success: false, requiresOTPVerification: true, email: res.data.email, msg: res.data.msg };
+            }
+
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
@@ -25,8 +31,36 @@ export const AuthProvider = ({ children }) => {
             } else {
                 navigate(`/${res.data.user.role}`);
             }
+            return { success: true };
         } catch (err) {
+            if (err.response?.data?.requiresOTPVerification) {
+                return { success: false, requiresOTPVerification: true, email: err.response.data.email, msg: err.response.data.msg };
+            }
             alert(err.response?.data?.msg || "Login failed");
+            return { success: false };
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const verifyOTPLogin = async (email, otp) => {
+        try {
+            setLoading(true);
+            const res = await API.post("/auth/verify-otp", { email, otp });
+            
+            localStorage.setItem("token", res.data.token);
+            localStorage.setItem("user", JSON.stringify(res.data.user));
+            setUser(res.data.user);
+
+            if (res.data.user.role === "officer" && !res.data.user.verified) {
+                navigate("/pending-verification");
+            } else {
+                navigate(`/${res.data.user.role}`);
+            }
+            return { success: true };
+        } catch (err) {
+            alert(err.response?.data?.msg || "OTP verification failed");
+            return { success: false, msg: err.response?.data?.msg };
         } finally {
             setLoading(false);
         }
@@ -53,23 +87,26 @@ export const AuthProvider = ({ children }) => {
         try {
             setLoading(true);
             const res = await API.post("/auth/register", data);
-            if (res.data.user.role === "officer" && res.data.user.status === "pending") {
-                alert("Registration successful. Your account is waiting for admin approval");
-                navigate("/login");
-                return;
+            
+            // Registration successful, user needs to verify OTP
+            if (res.data.requiresOTPVerification) {
+                return true; // Return true to proceed to OTP verification
             }
+
+            // Fallback for old registration flow (shouldn't happen)
             localStorage.setItem("token", res.data.token);
             localStorage.setItem("user", JSON.stringify(res.data.user));
             setUser(res.data.user);
 
-            // Newly registered officers need admin approval first
             if (res.data.user.role === "officer" && !res.data.user.verified) {
                 navigate("/pending-verification");
             } else {
                 navigate(`/${res.data.user.role}`);
             }
+            return true;
         } catch (err) {
             alert(err.response?.data?.msg || "Registration failed");
+            return false;
         } finally {
             setLoading(false);
         }
@@ -82,7 +119,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, loginWithGoogle, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, loginWithGoogle, register, verifyOTPLogin, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );
