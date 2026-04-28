@@ -12,22 +12,32 @@ function Navbar() {
     };
 
     return (
-        <nav className="bg-[#62109F] shadow p-4 flex justify-between items-center">
-            <div className="flex space-x-2 items-center">
+        <nav className="bg-slate-950 border-b border-white/5 shadow-xl px-6 py-4 flex justify-between items-center">
+            <div className="flex space-x-3 items-center">
                 {user && user.role === 'citizen' && <HamburgerMenu />}
-                <h1 className="text-2xl font-bold text-white">CivicConnect </h1>
-                <img src="/src/assets/favicon.png"  alt="CivicConnect Logo" className="w-8 h-8 ml-2 inline-block" />
+                <div className="flex items-center space-x-3">
+                    <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-lg shadow-lg shadow-orange-500/20">
+                        <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-6 h-6" />
+                    </div>
+                    <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-300 bg-clip-text text-transparent">CivicConnect</h1>
+                </div>
             </div>
-            <div className="space-x-4">
+            <div className="flex items-center space-x-6">
                 {!user ? (
                     <>
-                        <Link to="/login" className="text-purple-700 hover:underline">Login</Link>
-                        <Link to="/register" className="text-green-600 hover:underline">Register</Link>
+                        <Link to="/login" className="text-slate-400 hover:text-white font-medium transition duration-200">Login</Link>
+                        <Link to="/register" className="bg-gradient-to-r from-orange-500 to-amber-600 text-white px-5 py-2 rounded-lg hover:from-orange-600 hover:to-amber-700 transition duration-200 font-semibold shadow-lg shadow-orange-500/20">Register</Link>
                     </>
                 ) : (
                     <>
-                        <b><span className="text-white">Hi, {user.name}</span></b>
-                        <button onClick={handleLogout} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                        <div className="text-right">
+                            <span className="text-slate-300 text-sm">Welcome back</span>
+                            <p className="text-white font-semibold">{user.name}</p>
+                        </div>
+                        <button 
+                            onClick={handleLogout} 
+                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition duration-200 font-medium"
+                        >
                             Logout
                         </button>
                     </>

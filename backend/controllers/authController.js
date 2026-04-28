@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const https = require('https');
 const User = require('../models/User');
+const Department = require('../models/Department');
+const { generateOTP, sendOTPEmail } = require('../config/email');
 
 const fetchGoogleUser = (accessToken) => {
     return new Promise((resolve, reject) => {
@@ -43,7 +45,7 @@ const fetchGoogleUser = (accessToken) => {
 };
 
 /**
- * Register a new user
+ * Register a new user (sends OTP to email)
  * @route POST /api/auth/register
  * @access Public
  */
@@ -88,6 +90,10 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
+        // Generate OTP
+        const otp = generateOTP();
+        const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+
         // Prepare user data
         const userData = {
             name,
@@ -95,10 +101,76 @@ exports.register = async (req, res) => {
             password: hashedPassword,
             role,
             department: role === 'officer' ? department : null,
+            status: role === 'officer' ? 'pending' : 'approved',
+            emailVerified: false,
+            otp,
+            otpExpiry,
         };
 
         // Create new user
         const user = new User(userData);
+        await user.save();
+
+        // Send OTP email
+        const emailSent = await sendOTPEmail(user.email, otp, user.name);
+        if (!emailSent) {
+            // Delete the user if email sending fails
+            await User.findByIdAndDelete(user._id);
+            return res.status(500).json({ msg: 'Failed to send OTP email. Please try again.' });
+        }
+
+        // Send response (user created but not verified yet)
+        res.status(201).json({
+            msg: 'Registration successful! Please check your email for OTP.',
+            email: user.email,
+            userId: user._id,
+            requiresOTPVerification: true,
+        });
+    } catch (err) {
+        console.error('Register Error:', err);
+        res.status(500).json({ msg: 'Server error during registration' });
+    }
+};
+
+/**
+ * Verify OTP and complete registration
+ * @route POST /api/auth/verify-otp
+ * @access Public
+ */
+exports.verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+
+        // Validate required fields
+        if (!email || !otp) {
+            return res.status(400).json({ msg: 'Please provide email and OTP' });
+        }
+
+        // Find user by email
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ msg: 'User not found' });
+        }
+
+        // Check if already verified (except for admins who use OTP for login)
+        if (user.emailVerified && user.role !== 'admin') {
+            return res.status(400).json({ msg: 'Email already verified' });
+        }
+
+        // Check OTP
+        if (user.otp !== otp) {
+            return res.status(400).json({ msg: 'Invalid OTP' });
+        }
+
+        // Check OTP expiry
+        if (new Date() > user.otpExpiry) {
+            return res.status(400).json({ msg: 'OTP has expired. Please register again.' });
+        }
+
+        // Mark email as verified
+        user.emailVerified = true;
+        user.otp = null;
+        user.otpExpiry = null;
         await user.save();
 
         // Generate JWT token
@@ -109,19 +181,68 @@ exports.register = async (req, res) => {
         );
 
         // Send response
-        res.status(201).json({
+        res.json({
+            msg: 'Email verified successfully!',
             token,
             user: {
                 id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
+                emailVerified: user.emailVerified,
+                verified: user.verified,
             },
         });
     } catch (err) {
-        console.error('Register Error:', err);
-        res.status(500).json({ msg: 'Server error during registration' });
+        console.error('Verify OTP Error:', err);
+        res.status(500).json({ msg: 'Server error during OTP verification' });
+    }
+};
+
+/**
+ * Resend OTP to email
+ * @route POST /api/auth/resend-otp
+ * @access Public
+ */
+exports.resendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ msg: 'Please provide email' });
+        }
+
+        const user = await User.findOne({ email: email.toLowerCase() });
+        if (!user) {
+            return res.status(400).json({ msg: 'User not found' });
+        }
+
+        // Check if already verified (except for admins who use OTP for login)
+        if (user.emailVerified && user.role !== 'admin') {
+            return res.status(400).json({ msg: 'Email already verified' });
+        }
+
+        // Generate new OTP
+        const otp = generateOTP();
+        const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+
+        // Update user with new OTP
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
+        await user.save();
+
+        // Send OTP email
+        const emailSent = await sendOTPEmail(user.email, otp, user.name);
+        if (!emailSent) {
+            return res.status(500).json({ msg: 'Failed to send OTP email. Please try again.' });
+        }
+
+        res.json({ msg: 'OTP resent successfully. Check your email.' });
+    } catch (err) {
+        console.error('Resend OTP Error:', err);
+        res.status(500).json({ msg: 'Server error while resending OTP' });
     }
 };
 
@@ -142,13 +263,37 @@ exports.login = async (req, res) => {
         // Find user by email (case-insensitive)
         const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
-            return res.status(400).json({ msg: 'Invalid email or password' });
+            return res.status(404).json({ msg: 'Kindly register to use the site' });
         }
 
         // Check password
         const isPasswordMatch = await bcrypt.compare(password, user.password);
         if (!isPasswordMatch) {
             return res.status(400).json({ msg: 'Invalid email or password' });
+        }
+
+        // Admin OTP verification on every login
+        if (user.role === 'admin') {
+            const otp = generateOTP();
+            const otpExpiry = new Date(Date.now() + parseInt(process.env.OTP_EXPIRY || 10) * 60 * 1000);
+            user.otp = otp;
+            user.otpExpiry = otpExpiry;
+            await user.save();
+            await sendOTPEmail(user.email, otp, user.name);
+            return res.json({ 
+                msg: 'Admin login requires OTP verification. Check your email.',
+                requiresOTPVerification: true,
+                email: user.email
+            });
+        }
+
+        // Email verification block removed for non-admins to allow test accounts to log in
+
+        if (user.role === 'officer' && user.status === 'pending') {
+            return res.status(403).json({ msg: 'Your account is waiting for admin approval' });
+        }
+        if (user.role === 'officer' && user.status === 'rejected') {
+            return res.status(403).json({ msg: 'Your officer account request was rejected' });
         }
 
         user.lastLogin = new Date();
@@ -169,7 +314,9 @@ exports.login = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
+                verified: user.verified,
             },
         });
     } catch (err) {
@@ -241,6 +388,7 @@ exports.googleLogin = async (req, res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                status: user.status,
                 department: user.department,
             },
         });
@@ -396,5 +544,75 @@ exports.getLeaderboard = async (req, res) => {
     } catch (err) {
         console.error('Get Leaderboard Error:', err);
         res.status(500).json({ msg: 'Server error while fetching leaderboard' });
+    }
+};
+
+/**
+ * Admin: Get all pending officers
+ * @route GET /api/auth/officers/pending
+ * @access Private (admin)
+ */
+exports.getPendingOfficers = async (req, res) => {
+    try {
+        const officers = await User.find({ role: 'officer', status: 'pending' }).select('-password');
+        res.json(officers);
+    } catch (err) {
+        console.error('Get Pending Officers Error:', err);
+        res.status(500).json({ msg: 'Server error' });
+    }
+};
+
+/**
+ * Admin: Update officer status
+ * @route PUT /api/auth/officers/:id/status
+ * @access Private (admin)
+ */
+exports.updateOfficerStatus = async (req, res) => {
+    try {
+        const { status } = req.body;
+        if (!['approved', 'rejected'].includes(status)) {
+            return res.status(400).json({ msg: 'Invalid status' });
+        }
+
+        // Keep both approval fields in sync:
+        // - status  → checked by login controller
+        // - verified → checked by auth middleware on every request
+        const updateFields = {
+            status,
+            verified: status === 'approved'   // true when approved, false when rejected
+        };
+
+        const officer = await User.findOneAndUpdate(
+            { _id: req.params.id, role: 'officer' },
+            updateFields,
+            { new: true }
+        ).select('-password');
+
+        if (!officer) {
+            return res.status(404).json({ msg: 'Officer not found' });
+        }
+
+        // When approving: ensure officer is in their Department's officers list
+        if (status === 'approved' && officer.department) {
+            await Department.findOneAndUpdate(
+                { name: officer.department },
+                { $addToSet: { officers: officer._id } }, // addToSet = no duplicates
+                { upsert: true, new: true }               // create dept doc if missing
+            );
+            console.log(`[Dept Sync] Officer ${officer.name} added to ${officer.department} dept`);
+        }
+
+        // When rejecting: remove officer from Department
+        if (status === 'rejected' && officer.department) {
+            await Department.findOneAndUpdate(
+                { name: officer.department },
+                { $pull: { officers: officer._id } }
+            );
+        }
+
+        res.json({ msg: `Officer ${status} successfully`, officer });
+    } catch (err) {
+        console.error('Update Officer Status Error:', err);
+        res.status(500).json({ msg: 'Server error' });
     }
 };
