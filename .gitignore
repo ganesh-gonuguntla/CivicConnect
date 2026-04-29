@@ -1,0 +1,176 @@
+# Environment Variables
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+.env.test.local
+
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-workspace
+*.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# Build & Distribution
+dist/
+build/
+*.tsbuildinfo
+.next/
+out/
+.nuxt/
+.cache/
+.vuepress/dist
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+pip-log.txt
+pip-delete-this-directory.txt
+.pyre/
+
+# Testing
+coverage/
+.nyc_output/
+.jest_output/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+*.pem
+
+# Sensitive Data & API Keys (CRITICAL)
+# Database URIs
+mongodb_uri.txt
+
+# API Keys & Secrets
+*_secret.js
+*_key.js
+*.key
+*.pem
+*.crt
+
+# OAuth Credentials
+google_oauth_secret.js
+google_credentials.json
+
+# Cloudinary Credentials
+cloudinary_config.js
+cloudinary_secrets.js
+
+# Email Credentials
+email_password.txt
+smtp_credentials.json
+
+# JWT Secrets
+jwt_secret.txt
+
+# Temporary Files
+*.tmp
+*.temp
+*.bak
+*.backup
+temp/
+tmp/
+
+# Vite specific
+.vite/
+
+# npm
+npm-debug.log
+
+# yarn
+yarn-error.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+mongo_dump/
+
+# API Documentation
+api_docs_private/
+
+# Backups
+backups/
+*.zip
+*.rar
+
+# Config files with secrets
+config/local.js
+config/secrets.js
+
+# VS Code Workspace Settings
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# IntelliJ
+*.iml
+.idea/
+
+# MacOS
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Local development
+local_config.js
+dev_keys.json
+
+# Uploaded files (if storing locally)
+uploads/
+public/uploads/
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# CI/CD
+.github/workflows/secrets.yml
+
+# Package managers
+.npm/
+.yarn/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Output of 'npm pack'
+*.tgz
+
+# Misc
+.env.local.js
+*.pem
+private_key.*
