@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
+import logo from '../assets/favicon.png';
 
 function Navbar() {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Navbar() {
                 {user && user.role === 'citizen' && <HamburgerMenu />}
                 <div className="flex items-center space-x-3">
                     <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-2 rounded-lg shadow-lg shadow-orange-500/20">
-                        <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-6 h-6" />
+                        <img src={logo} alt="CivicConnect Logo" className="w-6 h-6" />
                     </div>
                     <h1 className="text-2xl font-bold bg-gradient-to-r from-violet-400 to-fuchsia-300 bg-clip-text text-transparent">CivicConnect</h1>
                 </div>

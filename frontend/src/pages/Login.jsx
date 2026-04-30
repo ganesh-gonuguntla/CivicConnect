@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../context/AuthContext";
+import logo from "../assets/favicon.png";
 
 function Login() {
     const { login, loginWithGoogle, verifyOTPLogin, loading } = useAuth();
@@ -59,7 +60,7 @@ function Login() {
                     {/* Header gradient */}
                     <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 px-8 py-12 text-center">
                         <div className="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl shadow-lg flex items-center justify-center">
-                            <img src="/src/assets/favicon.png" alt="CivicConnect Logo" className="w-10 h-10" />
+                            <img src={logo} alt="CivicConnect Logo" className="w-10 h-10" />
                         </div>
                         <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
                         <p className="text-purple-100">Sign in to your CivicConnect account</p>
