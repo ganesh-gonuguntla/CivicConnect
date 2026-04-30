@@ -6,7 +6,7 @@ import { getChatMessages, uploadChatMedia } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 // Derives backend URL from the API base (avoids hardcoding port)
-const SOCKET_URL = 'http://localhost:3000';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 /* ─── Tick indicator ────────────────────────────────────────── */
 function Ticks({ deliveredAt, readAt }) {
